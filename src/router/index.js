@@ -14,11 +14,11 @@ const router = createRouter({
         const userRole = (userData && userData.role) ? userData.role : null
         console.log( userRole, "userRole");
         if (userRole === 'admin')
-          return { name: '-crmapps-user-list' }
+          return { name: 'apps-user-list' }
         if (userRole === 'client')
           return { name: 'access-control' }
         
-        return { name: 'dashboards-crm', query: to.query }
+        return { name: 'apps-user-list', query: to.query }
       },
     },
     {
