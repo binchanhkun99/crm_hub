@@ -12,7 +12,7 @@ const rowPerPage = ref(10);
 const currentPage = ref(0);
 const totalPage = ref(10);
 const totalUsers = ref(0);
-const bannerData = ref([]);
+const dataPack = ref([]);
 const loading = ref(false);
 const apiKey = ref();
 const page = ref();
@@ -57,18 +57,18 @@ const userListMeta = [
 const pageSize = ref(0);
 
 page.value = currentPage.value;
-// 👉 Fetching bannerData
-const fetchBanner = async () => {
+// 👉 Fetching dataPack
+const fetchPackage = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
     .get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=banner_list`
+      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=pack_list`
     )
     .then((rss) => {
       if (rss.data.status) {
-        bannerData.value = rss.data.data;
+        dataPack.value = rss.data.data;
         totalPage.value = rss.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
         loading.value = false;
@@ -77,13 +77,13 @@ const fetchBanner = async () => {
     })
     .catch((error) => {
       loading.value = false;
-      // console.log(error);
+      console.log(error);
     });
   selectedRole.value = "all";
   selectedPlan.value = "all";
 };
-// 👉 Fetching bannerData
-const fetchBannerPag = async (page) => {
+// 👉 Fetching dataPack
+const fetchPackagePag = async (page) => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
@@ -93,7 +93,7 @@ const fetchBannerPag = async (page) => {
     )
     .then((rss) => {
       if (rss.data.success) {
-        bannerData.value = rss.data.data;
+        dataPack.value = rss.data.data;
 
         totalPage.value = rss.data.count;
         console.log(" totalPage.value", totalPage.value);
@@ -115,7 +115,7 @@ watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
 });
 watch(currentPage, (newVal, oldVal) => {
-  fetchBannerPag(newVal);
+  fetchPackagePag(newVal);
 });
 
 // 👉 search filters
@@ -197,11 +197,11 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = bannerData.value.length
+  const firstIndex = dataPack.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
   const lastIndex =
-    bannerData.value.length + currentPage.value * rowPerPage.value;
+    dataPack.value.length + currentPage.value * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
 });
@@ -219,7 +219,7 @@ watch(
   { deep: true }
 );
 
-// 👉 Delete GPT
+// 👉 Delete Package
 const open = ref(false);
 const idDelete = ref();
 const showModal = (id) => {
@@ -233,13 +233,13 @@ const handleOk = (e) => {
 const deleteUser = async () => {
   try {
     const deleteUsr = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_delete`,
+      `api/admin/index.php?key=${apiKey.value}&action=pack_delete`,
       {
         id: idDelete.value,
       }
     );
     if (deleteUsr.data.data == 1) {
-      fetchBanner();
+      fetchPackage();
       open.value = false;
       pushNotiSuccess();
     } else {
@@ -256,30 +256,104 @@ const deleteUser = async () => {
 // 👉 Search User
 const SearchUser = async () => {
   currentPage.value = 0;
-  fetchBanner();
+  fetchPackage();
 };
 
-// 👉 Add GPT
+// 👉 Add package
 const title = ref();
-const Url = ref();
-const Des = ref();
+const Description = ref();
+const TimeDate = ref();
+const Expiry_date = ref();
+const Price = ref();
+const Platform = ref();
+const Support_ids = ref();
 const loadingAddUser = ref(false);
+const supportList = ref();
+
+const selectItemData = ref([]);
+const beforAdd = async () => {
+  loadingEdit.value = true;
+  try {
+    const res = await request.get(
+      `api/admin/index.php?key=${apiKey.value}&action=select_promt`
+    );
+    if (res.data.status) {
+      supportList.value = res.data.data;
+      isDialogVisible.value = true;
+      loadingEdit.value = false;
+    } else {
+      loadingEdit.value = false;
+    }
+  } catch (error) {
+    console.log(error);
+    loadingEdit.value = false;
+  }
+};
+const beforEdit = async () => {
+  loadingEdit.value = true;
+  try {
+    const res = await request.get(
+      `api/admin/index.php?key=${apiKey.value}&action=select_promt`
+    );
+    if (res.data.status) {
+      supportList.value = res.data.data;
+      loadingEdit.value = false;
+    } else {
+      loadingEdit.value = false;
+    }
+  } catch (error) {
+    console.log(error);
+    loadingEdit.value = false;
+  }
+};
+const platformLists = ["web", "extension", "window", "android", "iphone"];
+const clearFields = () => {
+  title.value = ""; // Clear title field
+  Description.value = ""; // Clear Description field
+  TimeDate.value = ""; // Clear TimeDate field
+  Expiry_date.value = ""; // Clear Expiry_date field
+  Price.value = ""; // Clear Price field
+  Support_ids.value = []; // Clear Support_ids field
+  Platform.value = []; // Clear Platform field
+};
 const addUser = async () => {
   try {
+    // Check if required fields are not empty
+    if (
+      !title.value ||
+      !Description.value ||
+      !TimeDate.value ||
+      !Expiry_date.value ||
+      !Price.value ||
+      !Support_ids.value ||
+      !Platform.value
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
+    console.log("LOGI", Support_ids.value);
+    const supportIdsString = Support_ids.value.join(",");
+    const platformString = Platform.value.join(",");
+
     loadingAddUser.value = true;
     const response = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_create`,
+      `api/admin/index.php?key=${apiKey.value}&action=pack_create`,
       {
         title: title.value,
-        url: Url.value,
-        des: Des.value,
+        description: Description.value,
+        date: TimeDate.value,
+        expiry_date: Expiry_date.value,
+        price: Price.value,
+        support_ids: supportIdsString,
+        platform: platformString,
       }
     );
     if (response.data.data === 1) {
       loadingAddUser.value = false;
       isDialogVisible.value = false;
-      fetchBanner();
+      fetchPackage();
       pushNotiSuccess();
+      clearFields();
     } else {
       isDialogVisible.value = false;
       loadingAddUser.value = false;
@@ -293,33 +367,66 @@ const addUser = async () => {
   }
 };
 
-// 👉 Edit Banner
+// 👉 Edit Package
 const loadingEdit = ref(false);
 const isDialogEdit = ref(false);
 const Edit = ref({
   title: "",
-  Url: "",
-  Des: "",
+  Description: "",
+  TimeDate: "",
+  Expiry_date: "",
+  Price: "",
+  Support_ids: "",
+  Platform: "",
 });
 function resetEditValues() {
   Edit.value.title = "";
-  Edit.value.Url = "";
-  Edit.value.Des;
+  Edit.value.Description = "";
+  Edit.value.TimeDate;
+  Edit.value.Expiry_date = "";
+  Edit.value.Price = "";
+  Edit.value.Support_ids = "";
+  Edit.value.Platform = "";
 }
-const idBannerEdit = ref();
+const idPackEdit = ref();
+const prListEditVal = ref();
 const showEdit = async (id) => {
   resetEditValues();
-  idBannerEdit.value = id;
+  const prListEdit = await beforEdit();
+  idPackEdit.value = id;
   loadingEdit.value = true;
   try {
-    const res = await request.get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&id=${idBannerEdit.value}&action=banner_list`
+    const res = await request.post(
+      `api/admin/index.php?key=${apiKey.value}&action=pack_find`,
+      {
+        id: idPackEdit.value,
+      }
     );
     if (res.data.status) {
       const data = res.data.data[0];
+      const dl = data.platform.split(",");
+      
+      let sp;
+      sp = [];
+      if (typeof data.support_ids === 'string') {
+        sp = data.support_ids.split(",");
+      } else {
+        sp = [data.support_ids];
+      }
+      selectItemData.value = []
+      for (const temp of sp) {
+       
+        selectItemData.value.push(parseInt(temp));
+      }
+      prListEditVal.value = sp;
+      console.log(prListEditVal.value);
       Edit.value.title = data.title;
-      Edit.value.Url = data.url;
-      Edit.value.Des = data.des;
+      Edit.value.Description = data.description;
+      Edit.value.TimeDate = data.date;
+      Edit.value.Expiry_date = data.expiry_date;
+      Edit.value.Price = data.price;
+      Edit.value.Support_ids = selectItemData.value;
+      Edit.value.Platform = dl;
       loadingEdit.value = false;
       isDialogEdit.value = true;
     }
@@ -330,13 +437,6 @@ const showEdit = async (id) => {
   }
 };
 
-const items = ref([
-  { label: "Admin", value: 0 },
-  { label: "Nhân viên", value: 1 },
-  { label: "Đại lý", value: 2 },
-  { label: "Cộng tác viên", value: 3 },
-  { label: "Người dùng", value: 4 },
-]);
 // watch(selectedItem, (newVal, oldVal)=>{
 //   console.log(newVal);
 // })
@@ -354,17 +454,42 @@ const pushNotiError = () => {
     notiError.value = false;
   }, 2000);
 };
+
 const SaveEdit = async () => {
   try {
+    const plfStringEdit = Edit.value.Platform.join(",");
+    const spidsStringEdit = Edit.value.Support_ids.join(",");
+    if (
+      !Edit.value.title ||
+      !Edit.value.Description ||
+      !Edit.value.TimeDate ||
+      !Edit.value.Expiry_date ||
+      !Edit.value.Price ||
+      !spidsStringEdit ||
+      !plfStringEdit
+    ) {
+      console.log("Title:", Edit.value.title);
+      console.log("Description:", Edi.valuet.Description);
+      console.log("TimeDate:", Edit.value.TimeDate);
+      console.log("Expiry_date:", Edit.value.Expiry_date);
+      console.log("Price:", Edit.value.Price);
+      console.log("Support_ids:", spidsStringEdit.value);
+      console.log("Platform:", plfStringEdit.value);
+      alert("Please fill in all fields");
+      return;
+    }
     loadingAddUser.value = true;
     const res = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_edit`,
+      `api/admin/index.php?key=${apiKey.value}&action=pack_edit`,
       {
-        id: idBannerEdit.value,
-        url: Edit.value.Url,
-        des: Edit.value.Des,
-        // user: Edit.value.ngayHetHan1,
-        // user: Edit.value.ngayDangKy1,
+        id: idPackEdit.value,
+        title: Edit.value.title,
+        description: Edit.value.Description,
+        date: Edit.value.TimeDate,
+        expiry_date: Edit.value.Expiry_date,
+        price: Edit.value.Price,
+        platform: plfStringEdit,
+        support_ids: spidsStringEdit,
       },
       {
         "Access-Control-Allow-Origin": "*",
@@ -375,7 +500,7 @@ const SaveEdit = async () => {
       isDialogEdit.value = false;
       loadingAddUser.value = false;
       pushNotiSuccess();
-      fetchBanner();
+      fetchPackage();
     } else {
       loadingAddUser.value = false;
       isDialogEdit.value = false;
@@ -389,16 +514,17 @@ const SaveEdit = async () => {
   }
 };
 // 👉 OnMounted
-onMounted(() => {
-  fetchBanner();
+onMounted(async () => {
+  // await beforEdit();
+  fetchPackage();
 });
 </script>
 
 <template>
   <section>
     <div>
-      <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
-        <p>Bạn có chắc muốn xoá Banner này?</p>
+      <a-modal v-model:open="open" title="Delete Package" @ok="handleOk">
+        <p>Bạn có chắc muốn xoá Package này?</p>
       </a-modal>
     </div>
     <VRow>
@@ -441,7 +567,7 @@ onMounted(() => {
       </VCol>
 
       <VCol cols="12">
-        <VCard title="Quản lý Banner">
+        <VCard title="Quản lý Pack">
           <VDivider />
 
           <VCardText class="d-flex flex-wrap gap-4">
@@ -450,10 +576,8 @@ onMounted(() => {
             <VSpacer />
 
             <div class="d-flex align-center">
-              <!-- 👉 Add Banner button -->
-              <VBtn @click="isDialogVisible = !isDialogVisible">
-                Add Banner
-              </VBtn>
+              <!-- 👉 Add Pack button -->
+              <VBtn @click="beforAdd"> Add Pack </VBtn>
             </div>
           </VCardText>
           <VDivider />
@@ -466,7 +590,7 @@ onMounted(() => {
                   <VCheckbox
                     :model-value="selectAllUser"
                     :indeterminate="
-                      bannerData.length !== selectedRows.length &&
+                      dataPack.length !== selectedRows.length &&
                       !!selectedRows.length
                     "
                     class="mx-1"
@@ -475,15 +599,19 @@ onMounted(() => {
                 </th> -->
                 <th scope="col">STT</th>
                 <th scope="col">Title</th>
-                <th scope="col">Url</th>
-                <th scope="col">Description</th>
+                <th scope="col">Time of Pack</th>
+                <th scope="col">Time hiệu lực</th>
+                <th scope="col">Chi tiết</th>
+                <th scope="col">Giá gói</th>
+
+                <th scope="col">Platform</th>
                 <th scope="col">ACTIONS</th>
               </tr>
             </thead>
 
             <!-- 👉 table body -->
             <tbody>
-              <tr v-for="(user, index) in bannerData" :key="index">
+              <tr v-for="(user, index) in dataPack" :key="index">
                 <!-- 👉 Checkbox -->
                 <!-- <td>
                   <VCheckbox
@@ -532,14 +660,29 @@ onMounted(() => {
 
                 <!-- 👉 URL banner -->
                 <td>
-                  <span class="text-capitalize text-base">{{ user.url }}</span>
+                  <span class="text-capitalize text-base">{{ user.date }}</span>
+                </td>
+                <td>
+                  <span class="text-capitalize text-base">{{
+                    user.expiry_date
+                  }}</span>
                 </td>
 
                 <!-- 👉 Description -->
                 <td>
                   <span class="text-base text-high-emphasis">{{
-                    user.des
+                    user.description
                   }}</span>
+                </td>
+                <td>
+                  <span class="text-base text-high-emphasis">{{
+                    user.price
+                  }}</span>
+                </td>
+                <td>
+                  <VCol cols="12">
+                    <VTextField v-model="user.platform" label="Platform" />
+                  </VCol>
                 </td>
 
                 <!-- 👉 Actions -->
@@ -556,7 +699,7 @@ onMounted(() => {
             </tbody>
 
             <!-- 👉 table footer  -->
-            <tfoot v-show="!bannerData.length">
+            <tfoot v-show="!dataPack.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
                   No data available
@@ -600,10 +743,15 @@ onMounted(() => {
       </VCol>
     </VRow>
 
-    <!-- 👉 Add New User -->
-    <VDialog v-model="isDialogVisible" max-width="600">
+    <!-- 👉 Add New pack -->
+    <VDialog
+      style="z-index: 2000 !important"
+      v-model="isDialogVisible"
+      persistent
+      max-width="600"
+    >
       <!-- Dialog Content -->
-      <VCard title="Add New GPT">
+      <VCard title="Add New Package">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -621,16 +769,75 @@ onMounted(() => {
             </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Url"
+                v-model="Description"
                 :rules="[requiredValidator]"
-                label="URL"
+                label="Description"
               />
             </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Des"
+                v-model="TimeDate"
+                type="number"
                 :rules="[requiredValidator]"
-                label="Description"
+                label="Date"
+              />
+            </VCol>
+            <VCol cols="12">
+              <AppDateTimePicker
+                v-model="Expiry_date"
+                label="Thời gian hiệu lực"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+            /></VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="Price"
+                :rules="[requiredValidator]"
+                label="Price"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VAutocomplete
+                v-model="Support_ids"
+                chips
+                closable-chips
+                multiple
+                :items="supportList"
+                item-title="promtName"
+                item-value="id"
+                label="Select"
+              >
+                <template #chip="{ props, item }">
+                  <VChip
+                    v-bind="props"
+                    :prepend-id="item.raw.id"
+                    :text="item.raw.promtName"
+                  />
+                </template>
+
+                <template #item="{ props, item }">
+                  <VListItem
+                    v-bind="props"
+                    :title="item?.raw?.promtName"
+                  ></VListItem>
+                </template>
+              </VAutocomplete>
+              <!-- <VAutocomplete
+                label="Supports"
+                :items="supportList.map((item) => item)"
+                chips
+                multiple
+                item-title="promtName"
+                item-value="id"
+                v-model="Support_ids"
+              /> -->
+            </VCol>
+            <VCol cols="12">
+              <VSelect
+                chips
+                multiple
+                v-model="Platform"
+                :items="platformLists"
+                label="Platform"
               />
             </VCol>
           </VRow>
@@ -662,7 +869,7 @@ onMounted(() => {
     <VDialog v-model="loadingEdit" width="300">
       <VCard color="primary" width="300">
         <VCardText class="pt-3">
-          Waiting for loading data banner.....
+          Waiting for loading data.....
           <VProgressLinear indeterminate class="mb-0" />
         </VCardText>
       </VCard>
@@ -686,10 +893,10 @@ onMounted(() => {
       </VCard>
     </VDialog>
 
-    <!-- 👉 Edit New User -->
+    <!-- 👉 Edit New Pack -->
     <VDialog persistent v-model="isDialogEdit" max-width="600">
       <!-- Edit Dialog -->
-      <VCard title="Edit GPT Key">
+      <VCard title="Edit Package">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -698,26 +905,89 @@ onMounted(() => {
 
         <VCardText>
           <VRow>
-            <!-- <VCol cols="12">
+            <VCol cols="12">
               <VTextField
                 v-model="Edit.title"
                 :rules="[requiredValidator]"
                 label="Title"
               />
-            </VCol> -->
+            </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Edit.Url"
+                v-model="Edit.Description"
                 :rules="[requiredValidator]"
-                label="Key"
+                label="Description"
               />
             </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Edit.Des"
+                type="number"
+                v-model="Edit.TimeDate"
                 :rules="[requiredValidator]"
-                label="Description"
+                label="Số ngày của gói"
               />
+            </VCol>
+            <VCol cols="12">
+              <AppDateTimePicker
+                v-model="Edit.Expiry_date"
+                label="Thời gian hiệu lực"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="Edit.Price"
+                :rules="[requiredValidator]"
+                label="Giá"
+                type="number"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VAutocomplete
+                v-model="Edit.Support_ids"
+                chips
+                closable-chips
+                multiple
+                :items="supportList"
+                item-title="promtName"
+                item-value="id"
+                label="Select"
+              >
+                <template #chip="{ props, item }">
+                  <VChip
+                    v-bind="props"
+                    :prepend-id="item.raw.id"
+                    :text="item.raw.promtName"
+                  />
+                </template>
+
+                <template #item="{ props, item }">
+                  <VListItem
+                    v-bind="props"
+                    :title="item?.raw?.promtName"
+                  ></VListItem>
+                </template>
+              </VAutocomplete>
+              <!-- <VAutocomplete
+                label="Supports"
+                :items="supportList"
+                chips
+                multiple
+                item-title="promtName"
+                item-value="id"
+                v-model="Edit.Support_ids"
+              /> -->
+            </VCol>
+            <VCol cols="12">
+              <VCol cols="12">
+                <VSelect
+                  chips
+                  multiple
+                  v-model="Edit.Platform"
+                  :items="platformLists"
+                  label="Platform"
+                />
+              </VCol>
             </VCol>
           </VRow>
         </VCardText>

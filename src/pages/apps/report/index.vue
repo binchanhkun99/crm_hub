@@ -2,7 +2,9 @@
 import request from "@/utils/request";
 import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { requiredValidator } from "@validators";
+import exportFromJSON from "export-from-json";
 import { onMounted, watch } from "vue";
+
 const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref();
@@ -388,6 +390,24 @@ const SaveEdit = async () => {
     isDialogEdit.value = false;
   }
 };
+const exportTable = ref()
+const ExportExcel = ()=>{
+  console.log("exportTable", exportTable.value);
+    const fileName = "np-data";
+  const data = bannerData.value;
+  for (const item of data) {
+  if (item.des) {
+    item.des = unescape(item.des);
+  }
+}
+console.log(data);
+  const exportType = exportFromJSON.types.csv;
+  if (data) exportFromJSON({ data, fileName, exportType });
+}
+
+
+
+
 // 👉 OnMounted
 onMounted(() => {
   fetchBanner();
@@ -396,6 +416,15 @@ onMounted(() => {
 
 <template>
   <section>
+    <!-- <table ref="exportTable">
+      <tbody>
+        <tr>
+          <td>h1</td>
+          <td>h2</td>
+          <td>h3</td>
+        </tr>
+      </tbody>
+    </table> -->
     <div>
       <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
         <p>Bạn có chắc muốn xoá Banner này?</p>
@@ -455,10 +484,16 @@ onMounted(() => {
                 Add Banner
               </VBtn>
             </div>
+            <div class="d-flex align-center">
+              <!-- 👉 Add Banner button -->
+              <VBtn @click="ExportExcel">
+                Export
+              </VBtn>
+            </div>
           </VCardText>
           <VDivider />
           <VProgressLinear v-if="loading" indeterminate color="primary" />
-          <VTable class="text-no-wrap">
+          <VTable  class="text-no-wrap">
             <!-- 👉 table head -->
             <thead>
               <tr>

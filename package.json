@@ -11,6 +11,7 @@
     "postinstall": "npm run build:icons"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "@casl/ability": "6.5.0",
     "@casl/vue": "2.2.1",
     "@floating-ui/dom": "1.2.7",
@@ -23,6 +24,7 @@
     "axios-mock-adapter": "1.21.4",
     "chart.js": "4.3.0",
     "eslint-import-resolver-alias": "^1.1.2",
+    "export-from-json": "^1.7.4",
     "jwt-decode": "3.1.2",
     "pinia": "2.0.35",
     "prismjs": "1.29.0",

@@ -435,60 +435,8 @@ onMounted(() => {
       </VCol>
 
       <VCol cols="12">
-        <VCard title="Lọc người dùng">
-          <VCardText>
-            <VRow>
-              <!-- 👉 Select Role -->
-
-              <VCol cols="12" sm="3">
-                <VSelect
-                  v-model="selectedRole"
-                  label="Quyền"
-                  :items="roles"
-                  clearable
-                  clear-icon="bx-x"
-                />
-              </VCol>
-              <!-- 👉 Select Plan -->
-              <VCol cols="12" sm="3">
-                <VSelect
-                  v-model="selectedPlan"
-                  label="Gói cước"
-                  :items="plans"
-                  clearable
-                  clear-icon="bx-x"
-                />
-              </VCol>
-
-              <!-- 👉 Select Status -->
-              <VCol cols="12" sm="3">
-                <VSelect
-                  v-model="selectedStatus"
-                  label="Select Status"
-                  :items="status"
-                  clearable
-                  clear-icon="bx-x"
-                />
-              </VCol>
-              <!-- 👉 Search  -->
-              <VCol cols="12" sm="2">
-                <VTextField
-                  v-model="searchQuery"
-                  placeholder="Email or Username"
-                  density="compact"
-                  class="me-3"
-                />
-              </VCol>
-
-              <VCol cols="12" sm="1">
-                <!-- 👉 Add GPT button -->
-
-                <VBtn @click="SearchUser" color="primary">
-                  <VIcon icon="bx-search" />
-                </VBtn>
-              </VCol>
-            </VRow>
-          </VCardText>
+        <VCard title="Quản lý GPT">
+          <VCardText> </VCardText>
 
           <VDivider />
 
@@ -775,7 +723,7 @@ onMounted(() => {
           <VBtn color="secondary" variant="tonal" @click="isDialogEdit = false">
             Close
           </VBtn>
-          <VBtn @click="SaveEdit"> Save </VBtn>
+          <VBtn @click="SaveEdit"> Save</VBtn>
         </VCardText>
       </VCard>
     </VDialog>

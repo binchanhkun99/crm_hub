@@ -12,7 +12,7 @@ const rowPerPage = ref(10);
 const currentPage = ref(0);
 const totalPage = ref(10);
 const totalUsers = ref(0);
-const bannerData = ref([]);
+const discountData = ref([]);
 const loading = ref(false);
 const apiKey = ref();
 const page = ref();
@@ -57,18 +57,18 @@ const userListMeta = [
 const pageSize = ref(0);
 
 page.value = currentPage.value;
-// 👉 Fetching bannerData
-const fetchBanner = async () => {
+// 👉 Fetching discountData
+const fetchDiscount = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
     .get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=banner_list`
+      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=discount_list`
     )
     .then((rss) => {
       if (rss.data.status) {
-        bannerData.value = rss.data.data;
+        discountData.value = rss.data.data;
         totalPage.value = rss.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
         loading.value = false;
@@ -82,7 +82,7 @@ const fetchBanner = async () => {
   selectedRole.value = "all";
   selectedPlan.value = "all";
 };
-// 👉 Fetching bannerData
+// 👉 Fetching discountData
 const fetchBannerPag = async (page) => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
@@ -93,7 +93,7 @@ const fetchBannerPag = async (page) => {
     )
     .then((rss) => {
       if (rss.data.success) {
-        bannerData.value = rss.data.data;
+        discountData.value = rss.data.data;
 
         totalPage.value = rss.data.count;
         console.log(" totalPage.value", totalPage.value);
@@ -197,11 +197,11 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = bannerData.value.length
+  const firstIndex = discountData.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
   const lastIndex =
-    bannerData.value.length + currentPage.value * rowPerPage.value;
+    discountData.value.length + currentPage.value * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
 });
@@ -219,7 +219,7 @@ watch(
   { deep: true }
 );
 
-// 👉 Delete GPT
+// 👉 Delete Discount
 const open = ref(false);
 const idDelete = ref();
 const showModal = (id) => {
@@ -232,14 +232,10 @@ const handleOk = (e) => {
 };
 const deleteUser = async () => {
   try {
-    const deleteUsr = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_delete`,
-      {
-        id: idDelete.value,
-      }
-    );
+    const deleteUsr = await request.get(
+      `api/admin/index.php?key=${apiKey.value}&action=discount_delete&id=${idDelete.value}`);
     if (deleteUsr.data.data == 1) {
-      fetchBanner();
+      fetchDiscount();
       open.value = false;
       pushNotiSuccess();
     } else {
@@ -256,29 +252,40 @@ const deleteUser = async () => {
 // 👉 Search User
 const SearchUser = async () => {
   currentPage.value = 0;
-  fetchBanner();
+  fetchDiscount();
 };
 
-// 👉 Add GPT
-const title = ref();
-const Url = ref();
-const Des = ref();
+// 👉 Add Discount
+const Discount_name = ref();
+const Discount_code = ref();
+const Expiry_date = ref();
+const Discount_amount = ref();
 const loadingAddUser = ref(false);
 const addUser = async () => {
   try {
+    if (
+      !Discount_name.value ||
+      !Discount_code.value ||
+      !Expiry_date.value ||
+      !Discount_amount.value
+    ) {
+      alert("Please fill in all fields");
+      return;
+    }
     loadingAddUser.value = true;
     const response = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_create`,
+      `api/admin/index.php?key=${apiKey.value}&action=discount_create`,
       {
-        title: title.value,
-        url: Url.value,
-        des: Des.value,
+        discount_name: Discount_name.value,
+        discount_code: Discount_code.value,
+        expiry_date: Expiry_date.value,
+        discount_amount: Discount_amount.value,
       }
     );
     if (response.data.data === 1) {
       loadingAddUser.value = false;
       isDialogVisible.value = false;
-      fetchBanner();
+      fetchDiscount();
       pushNotiSuccess();
     } else {
       isDialogVisible.value = false;
@@ -293,18 +300,20 @@ const addUser = async () => {
   }
 };
 
-// 👉 Edit Banner
+// 👉 Edit Discount
 const loadingEdit = ref(false);
 const isDialogEdit = ref(false);
 const Edit = ref({
-  title: "",
-  Url: "",
-  Des: "",
+  Discount_name: "",
+  Discount_code: "",
+  Expiry_date: "",
+  Discount_amount: "",
 });
 function resetEditValues() {
-  Edit.value.title = "";
-  Edit.value.Url = "";
-  Edit.value.Des;
+  Edit.value.Discount_name = "";
+  Edit.value.Discount_code = "";
+  Edit.value.Expiry_date="";
+  Edit.value.Discount_amount="";
 }
 const idBannerEdit = ref();
 const showEdit = async (id) => {
@@ -312,14 +321,17 @@ const showEdit = async (id) => {
   idBannerEdit.value = id;
   loadingEdit.value = true;
   try {
-    const res = await request.get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&id=${idBannerEdit.value}&action=banner_list`
+    const res = await request.post(
+      `api/admin/index.php?key=${apiKey.value}&action=discount_find`,{
+        id: idBannerEdit.value
+      }
     );
     if (res.data.status) {
       const data = res.data.data[0];
-      Edit.value.title = data.title;
-      Edit.value.Url = data.url;
-      Edit.value.Des = data.des;
+      Edit.value.Discount_name = data.discount_name;
+      Edit.value.Discount_code = data.discount_code;
+      Edit.value.Expiry_date = data.expiry_date;
+      Edit.value.Discount_amount = data.discount_amount;
       loadingEdit.value = false;
       isDialogEdit.value = true;
     }
@@ -358,13 +370,13 @@ const SaveEdit = async () => {
   try {
     loadingAddUser.value = true;
     const res = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_edit`,
+      `api/admin/index.php?key=${apiKey.value}&action=discount_edit`,
       {
         id: idBannerEdit.value,
-        url: Edit.value.Url,
-        des: Edit.value.Des,
-        // user: Edit.value.ngayHetHan1,
-        // user: Edit.value.ngayDangKy1,
+        discount_name: Edit.value.Discount_name,
+        discount_code: Edit.value.Discount_code,
+        expiry_date: Edit.value.Expiry_date,
+        discount_amount: Edit.value.Discount_amount,
       },
       {
         "Access-Control-Allow-Origin": "*",
@@ -375,7 +387,7 @@ const SaveEdit = async () => {
       isDialogEdit.value = false;
       loadingAddUser.value = false;
       pushNotiSuccess();
-      fetchBanner();
+      fetchDiscount();
     } else {
       loadingAddUser.value = false;
       isDialogEdit.value = false;
@@ -390,15 +402,15 @@ const SaveEdit = async () => {
 };
 // 👉 OnMounted
 onMounted(() => {
-  fetchBanner();
+  fetchDiscount();
 });
 </script>
 
 <template>
   <section>
     <div>
-      <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
-        <p>Bạn có chắc muốn xoá Banner này?</p>
+      <a-modal v-model:open="open" title="Delete Discount" @ok="handleOk">
+        <p>Bạn có chắc muốn xoá Discount này?</p>
       </a-modal>
     </div>
     <VRow>
@@ -441,7 +453,7 @@ onMounted(() => {
       </VCol>
 
       <VCol cols="12">
-        <VCard title="Quản lý Banner">
+        <VCard title="Quản lý Discount">
           <VDivider />
 
           <VCardText class="d-flex flex-wrap gap-4">
@@ -450,9 +462,9 @@ onMounted(() => {
             <VSpacer />
 
             <div class="d-flex align-center">
-              <!-- 👉 Add Banner button -->
+              <!-- 👉 Add Discount button -->
               <VBtn @click="isDialogVisible = !isDialogVisible">
-                Add Banner
+                Add Discount
               </VBtn>
             </div>
           </VCardText>
@@ -466,7 +478,7 @@ onMounted(() => {
                   <VCheckbox
                     :model-value="selectAllUser"
                     :indeterminate="
-                      bannerData.length !== selectedRows.length &&
+                      discountData.length !== selectedRows.length &&
                       !!selectedRows.length
                     "
                     class="mx-1"
@@ -474,16 +486,17 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Title</th>
-                <th scope="col">Url</th>
-                <th scope="col">Description</th>
+                <th scope="col">Discount Name</th>
+                <th scope="col">Discount Code</th>
+                <th scope="col">Discount Amount</th>
+                <th scope="col">Expiry Date</th>
                 <th scope="col">ACTIONS</th>
               </tr>
             </thead>
 
             <!-- 👉 table body -->
             <tbody>
-              <tr v-for="(user, index) in bannerData" :key="index">
+              <tr v-for="(user, index) in discountData" :key="index">
                 <!-- 👉 Checkbox -->
                 <!-- <td>
                   <VCheckbox
@@ -523,22 +536,29 @@ onMounted(() => {
                           }"
                           class="font-weight-medium user-list-name"
                         > -->
-                        {{ user.title }}
+                        {{ user.discount_name }}
                         <!-- </RouterLink> -->
                       </h6>
                     </div>
                   </div>
                 </td>
 
-                <!-- 👉 URL banner -->
+                <!-- 👉 URL Discount -->
                 <td>
-                  <span class="text-capitalize text-base">{{ user.url }}</span>
+                  <span class="text-capitalize text-base">{{
+                    user.discount_code
+                  }}</span>
                 </td>
-
+                <!-- 👉 URL Discount -->
+                <td>
+                  <span class="text-capitalize text-base">{{
+                    user.discount_amount
+                  }}</span>
+                </td>
                 <!-- 👉 Description -->
                 <td>
                   <span class="text-base text-high-emphasis">{{
-                    user.des
+                    user.expiry_date
                   }}</span>
                 </td>
 
@@ -556,7 +576,7 @@ onMounted(() => {
             </tbody>
 
             <!-- 👉 table footer  -->
-            <tfoot v-show="!bannerData.length">
+            <tfoot v-show="!discountData.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
                   No data available
@@ -600,10 +620,10 @@ onMounted(() => {
       </VCol>
     </VRow>
 
-    <!-- 👉 Add New User -->
-    <VDialog v-model="isDialogVisible" max-width="600">
+    <!-- 👉 Add New Discount -->
+    <VDialog persistent v-model="isDialogVisible" max-width="600">
       <!-- Dialog Content -->
-      <VCard title="Add New GPT">
+      <VCard title="Add New Discount">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -614,23 +634,30 @@ onMounted(() => {
           <VRow>
             <VCol cols="12">
               <VTextField
-                v-model="title"
-                label="Title"
+                v-model="Discount_name"
+                label="Discount Name"
                 :rules="[requiredValidator]"
               />
             </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Url"
+                v-model="Discount_code"
                 :rules="[requiredValidator]"
-                label="URL"
+                label="Discount Code"
               />
             </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Des"
+                v-model="Discount_amount"
                 :rules="[requiredValidator]"
-                label="Description"
+                label="Discount Amount"
+              />
+            </VCol>
+            <VCol cols="12">
+              <AppDateTimePicker
+                v-model="Expiry_date"
+                label="Thời gian hiệu lực"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
               />
             </VCol>
           </VRow>
@@ -662,7 +689,7 @@ onMounted(() => {
     <VDialog v-model="loadingEdit" width="300">
       <VCard color="primary" width="300">
         <VCardText class="pt-3">
-          Waiting for loading data banner.....
+          Waiting for loading data Discount.....
           <VProgressLinear indeterminate class="mb-0" />
         </VCardText>
       </VCard>
@@ -698,25 +725,32 @@ onMounted(() => {
 
         <VCardText>
           <VRow>
-            <!-- <VCol cols="12">
-              <VTextField
-                v-model="Edit.title"
-                :rules="[requiredValidator]"
-                label="Title"
-              />
-            </VCol> -->
             <VCol cols="12">
               <VTextField
-                v-model="Edit.Url"
+                v-model="Edit.Discount_name"
                 :rules="[requiredValidator]"
-                label="Key"
+                label="Discount Name"
               />
             </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Edit.Des"
+                v-model="Edit.Discount_code"
                 :rules="[requiredValidator]"
-                label="Description"
+                label="Discount Code"
+              />
+            </VCol>
+            <VCol cols="12">
+                <AppDateTimePicker
+                v-model="Edit.Expiry_date"
+                label="Thời gian hiệu lực"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="Edit.Discount_amount"
+                :rules="[requiredValidator]"
+                label="Discount Amount"
               />
             </VCol>
           </VRow>

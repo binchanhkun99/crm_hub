@@ -3,6 +3,7 @@ import request from "@/utils/request";
 import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { emailValidator, requiredValidator } from "@validators";
 import { onMounted, watch } from "vue";
+import { UserOutlined, CloseOutlined } from "@ant-design/icons-vue";
 const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref();
@@ -19,6 +20,14 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
+const placements = [
+  "topLeft",
+  "top",
+  "topRight",
+  "bottomLeft",
+  "bottom",
+  "bottomRight",
+];
 
 const userListMeta = [
   {
@@ -96,9 +105,7 @@ const fetchUsersPag = async (page) => {
     .then((rss) => {
       if (rss.data.success) {
         users.value = rss.data.data;
-
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -252,7 +259,7 @@ const SearchUser = async () => {
 // 👉 Add User
 const maGioiThieuAdd = ref();
 const loadingAddUser = ref(false);
-const userName = ref()
+const userName = ref();
 const password = ref("");
 const email = ref("");
 const addUser = async () => {
@@ -268,15 +275,14 @@ const addUser = async () => {
       loadingAddUser.value = false;
       isDialogVisible.value = false;
       fetchUsers();
-    pushNotiSuccess()
-    }
-    else{
-      pushNotiError()
+      pushNotiSuccess();
+    } else {
+      pushNotiError();
     }
     isDialogVisible.value = false;
     loadingAddUser.value = false;
   } catch (error) {
-    pushNotiError()
+    pushNotiError();
     loadingAddUser.value = false;
     isDialogVisible.value = false;
     console.log(error);
@@ -410,6 +416,203 @@ const SaveEdit = async () => {
     isDialogEdit.value = false;
   }
 };
+
+const listService = ref();
+const packforUser = ref();
+const Expiry_date_pack = ref();
+const Price_pack = ref();
+const resetFielPack = () => {
+  listService.value = "";
+  packforUser.value = "";
+  Expiry_date_pack.value = "";
+  Price_pack.value = "";
+};
+const getListServiceNew = async () => {
+  loadingAddUser.value = true;
+
+  var data = JSON.parse(localStorage.getItem("user")) || {};
+  apiKey.value = data.key;
+  await request
+    .get(
+      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=pack_list`
+    )
+    .then((rss) => {
+      if (rss.data.status) {
+        listService.value = rss.data.data;
+        isNewService.value = true;
+        loadingAddUser.value = false;
+      }
+      loading.value = false;
+      loadingAddUser.value = false;
+    })
+    .catch((error) => {
+      loading.value = false;
+      loadingAddUser.value = false;
+      console.log(error);
+    });
+};
+const getListServiceEdit = async () => {
+  loadingAddUser.value = true;
+
+  var data = JSON.parse(localStorage.getItem("user")) || {};
+  apiKey.value = data.key;
+  await request
+    .get(
+      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=pack_list`
+    )
+    .then((rss) => {
+      if (rss.data.status) {
+        listService.value = rss.data.data;
+        isEditPack.value = true;
+        loadingAddUser.value = false;
+      }
+      loading.value = false;
+      loadingAddUser.value = false;
+    })
+    .catch((error) => {
+      loading.value = false;
+      loadingAddUser.value = false;
+      console.log(error);
+    });
+};
+
+const isEditPack = ref(false);
+
+const idUsEditService = ref();
+const EditService = async (id) => {
+  idUsEditService.value = id;
+  getUserById(idUsEditService.value);
+  getListServiceEdit();
+
+  console.log("Edit");
+};
+const EditPackID = ref();
+const EditPackprice = ref();
+const EditPackTime = ref();
+const UserFService = ref();
+const idServiceToEdit = ref();
+const getUserById = async (id) => {
+  loading.value = true;
+  var data = JSON.parse(localStorage.getItem("user")) || {};
+  apiKey.value = data.key;
+  await request
+    .get(`api/getAllUser.php?key=${apiKey.value}&id_user=${id}`)
+    .then((rss) => {
+      if (rss.data.success) {
+        console.log("rss.data.data", rss.data.data);
+        UserFService.value = rss.data.data;
+
+        EditPackID.value = rss.data.data[0].services[0].id_pack;
+        idServiceToEdit.value = rss.data.data[0].services[0].id;
+        EditPackprice.value = rss.data.data[0].services[0].price;
+        EditPackTime.value = rss.data.data[0].services[0].expiry_date;
+        loading.value = false;
+      }
+      loading.value = false;
+    })
+    .catch((error) => {
+      loading.value = false;
+      // console.log(error);
+    });
+};
+
+const EditServiceForUser = async () => {
+  var data = JSON.parse(localStorage.getItem("user")) || {};
+
+  apiKey.value = data.key;
+  await request
+    .post(`api/admin/index.php?key=${apiKey.value}&action=update_service`, {
+      id: idServiceToEdit.value,
+      id_user: idUsEditService.value,
+      id_pack: EditPackID.value,
+      expiry_date: EditPackTime.value,
+      price: EditPackprice.value,
+    })
+    .then((rss) => {
+      if (rss.data.status) {
+        pushNotiSuccess();
+        fetchUsers();
+        isEditPack.value = false;
+        loadingAddUser.value = false;
+      }
+      loading.value = false;
+      loadingAddUser.value = false;
+    })
+    .catch((error) => {
+      loading.value = false;
+      loadingAddUser.value = false;
+      console.log(error);
+      pushNotiError();
+    });
+};
+
+const isNewService = ref(false);
+const idUsNewService = ref();
+const NewService = async (id) => {
+  idUsNewService.value = id;
+  resetFielPack();
+  getListServiceNew();
+};
+const addNewServiceForUser = async () => {
+  var data = JSON.parse(localStorage.getItem("user")) || {};
+
+  apiKey.value = data.key;
+  await request
+    .post(`api/admin/index.php?key=${apiKey.value}&action=add_service`, {
+      id_user: idUsNewService.value,
+      id_pack: packforUser.value.id,
+      expiry_date: Expiry_date_pack.value,
+      price: Price_pack.value,
+    })
+    .then((rss) => {
+      if (rss.data.status) {
+        pushNotiSuccess();
+        fetchUsers();
+        isNewService.value = false;
+        loadingAddUser.value = false;
+      }
+      loading.value = false;
+      loadingAddUser.value = false;
+    })
+    .catch((error) => {
+      loading.value = false;
+      loadingAddUser.value = false;
+      console.log(error);
+      pushNotiError();
+    });
+};
+const openDeleteSv = ref(false)
+const idDeletePaCk = ref()
+const beforeDelete = (id)=>{
+  idDeletePaCk.value = id
+  openDeleteSv.value = true
+}
+const DeletePack = async ()=>{
+  var data = JSON.parse(localStorage.getItem("user")) || {};
+
+apiKey.value = data.key;
+await request
+  .post(`api/admin/index.php?key=${apiKey.value}&action=delete_service`, {
+    id: idDeletePaCk.value,
+   
+  })
+  .then((rss) => {
+    if (rss.data.status) {
+      pushNotiSuccess();
+      fetchUsers();
+      openDeleteSv.value = false;
+      loadingAddUser.value = false;
+    }
+    loading.value = false;
+    loadingAddUser.value = false;
+  })
+  .catch((error) => {
+    loading.value = false;
+    loadingAddUser.value = false;
+    console.log(error);
+    pushNotiError();
+  });
+}
 // 👉 OnMounted
 onMounted(() => {
   fetchUsers();
@@ -421,6 +624,11 @@ onMounted(() => {
     <div>
       <a-modal v-model:open="open" title="Delete User" @ok="handleOk">
         <p>Bạn có chắc muốn xoá User này?</p>
+      </a-modal>
+    </div>
+    <div>
+      <a-modal v-model:open="openDeleteSv" title="Delete Gói" @ok="DeletePack">
+        <p>Bạn có chắc muốn xoá gói dịch vụ cho User này?</p>
       </a-modal>
     </div>
     <VRow>
@@ -576,7 +784,7 @@ onMounted(() => {
                 <!-- 👉 User -->
                 <td>
                   <div class="d-flex align-center">
-                    {{ index+1 }}
+                    {{ index + 1 }}
                   </div>
                 </td>
                 <td>
@@ -635,7 +843,36 @@ onMounted(() => {
 
                 <!-- 👉 Gói Đăng Ký -->
                 <td>
-                  {{ user.status }}
+                  {{ user.services[0]?.pack_title || "Không có gói nào" }}
+                  <!-- <VIcon
+                    v-if="user.services[0]?.pack_title"
+                    icon="bxs-edit"
+                    @click="EditService(user.id)"
+                  />
+                  <VIcon v-else icon="bxs-edit" @click="NewService(user.id)" /> -->
+
+                  <a-dropdown>
+                    <VIcon icon="bx-dots-vertical-rounded" />
+                    <template #overlay>
+                      <a-menu>
+                        <a-menu-item key="0" v-if="!user.services[0]?.pack_title">
+                          <VBtn color="success" @click="NewService(user.id)">
+                            <VIcon icon="bx-folder-plus" />
+                          </VBtn>
+                        </a-menu-item>
+                        <a-menu-item key="1">
+                          <VBtn color="warning" @click="EditService(user.id)">
+                            <VIcon icon="bx-edit-alt" />
+                          </VBtn>
+                        </a-menu-item >
+                        <a-menu-item key="2" v-if="user.services[0]?.pack_title">
+                        <VBtn @click="beforeDelete(user.services[0]?.id)" color="error">
+                          <VIcon  icon="bx-trash" />
+                        </VBtn>
+                      </a-menu-item >
+                      </a-menu>
+                    </template>
+                  </a-dropdown>
                 </td>
                 <td>
                   <span class="text-base text-high-emphasis">{{
@@ -701,6 +938,106 @@ onMounted(() => {
         </VCard>
       </VCol>
     </VRow>
+    <!-- 👉 Add New Pack -->
+    <VDialog
+      persistent
+      v-model="isNewService"
+      max-width="600"
+      style="z-index: 2000"
+    >
+      <!-- Dialog Content -->
+      <VCard title="Add gói mới">
+        <DialogCloseBtn
+          variant="text"
+          size="small"
+          @click="isNewService = false"
+        />
+
+        <VCardText>
+          <VRow>
+            <VCol cols="12">
+              <VSelect
+                v-model="packforUser"
+                :items="listService"
+                label="Danh sách gói"
+                item-title="title"
+                item-value="id"
+                return-object
+              />
+            </VCol>
+            <VCol cols="12">
+              <AppDateTimePicker
+                v-model="Expiry_date_pack"
+                label="Thời gian hết hạn"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="Price_pack"
+                :rules="[requiredValidator]"
+                label="Giá gói"
+              />
+            </VCol>
+          </VRow>
+        </VCardText>
+        <VCardText class="d-flex justify-end gap-2">
+          <VBtn color="secondary" variant="tonal" @click="isNewService = false">
+            Close
+          </VBtn>
+          <VBtn @click="addNewServiceForUser"> Save </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+    <!-- 👉 Edit Pack for User -->
+    <VDialog
+      persistent
+      v-model="isEditPack"
+      max-width="600"
+      style="z-index: 2000"
+    >
+      <!-- Dialog Content -->
+      <VCard title="Edit User">
+        <DialogCloseBtn
+          variant="text"
+          size="small"
+          @click="isEditPack = false"
+        />
+        <VCardText>
+          <VRow>
+            <VCol cols="12">
+              <VSelect
+                v-model="EditPackID"
+                :items="listService"
+                label="Danh sách gói"
+                item-title="title"
+                item-value="id"
+              />
+            </VCol>
+            <VCol cols="12">
+              <AppDateTimePicker
+                v-model="EditPackTime"
+                label="Thời gian hết hạn"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="EditPackprice"
+                :rules="[requiredValidator]"
+                label="Giá gói"
+              />
+            </VCol>
+          </VRow>
+        </VCardText>
+        <VCardText class="d-flex justify-end gap-2">
+          <VBtn color="secondary" variant="tonal" @click="isEditPack = false">
+            Close
+          </VBtn>
+          <VBtn @click="EditServiceForUser"> Save </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
 
     <!-- 👉 Add New User -->
     <VDialog v-model="isDialogVisible" max-width="600">
@@ -715,7 +1052,11 @@ onMounted(() => {
         <VCardText>
           <VRow>
             <VCol cols="12">
-              <VTextField v-model="userName" label="Username"  :rules="[requiredValidator]"/>
+              <VTextField
+                v-model="userName"
+                label="Username"
+                :rules="[requiredValidator]"
+              />
             </VCol>
             <VCol cols="12">
               <VTextField
@@ -785,17 +1126,17 @@ onMounted(() => {
     <VDialog v-model="notiSuccess" width="300">
       <VCard color="primary" width="300">
         <VAlert type="success">
-           <strong>Thành công</strong>
+          <strong>Thành công</strong>
         </VAlert>
       </VCard>
     </VDialog>
 
-        <!-- Error-->
-        <VDialog v-model="notiError" width="300">
+    <!-- Error-->
+    <VDialog v-model="notiError" width="300">
       <VCard color="primary" width="300">
         <VAlert type="error">
-       <strong>Đã có lỗi xẩy ra vui lòng thử lại sau</strong> 
-    </VAlert>
+          <strong>Đã có lỗi xẩy ra vui lòng thử lại sau</strong>
+        </VAlert>
       </VCard>
     </VDialog>
 

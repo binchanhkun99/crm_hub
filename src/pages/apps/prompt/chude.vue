@@ -12,7 +12,7 @@ const rowPerPage = ref(10);
 const currentPage = ref(0);
 const totalPage = ref(10);
 const totalUsers = ref(0);
-const bannerData = ref([]);
+const chuDeList = ref([]);
 const loading = ref(false);
 const apiKey = ref();
 const page = ref();
@@ -57,21 +57,22 @@ const userListMeta = [
 const pageSize = ref(0);
 
 page.value = currentPage.value;
-// 👉 Fetching bannerData
+// 👉 Fetching chuDeList
+
+const ListChuDe = ref([]);
 const fetchBanner = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
-    .get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=banner_list`
-    )
+    .get(`api/getType.php?type=ChuDe`)
     .then((rss) => {
       if (rss.data.status) {
-        bannerData.value = rss.data.data;
+        const chuDeList = rss.data.data.filter((item) => item.ChuDe !== ""); // Lọc ra các phần tử có giá trị cho ChuDe
+        ListChuDe.value = chuDeList;
+
         totalPage.value = rss.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
-        loading.value = false;
       }
       loading.value = false;
     })
@@ -82,7 +83,8 @@ const fetchBanner = async () => {
   selectedRole.value = "all";
   selectedPlan.value = "all";
 };
-// 👉 Fetching bannerData
+
+// 👉 Fetching chuDeList
 const fetchBannerPag = async (page) => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
@@ -93,7 +95,7 @@ const fetchBannerPag = async (page) => {
     )
     .then((rss) => {
       if (rss.data.success) {
-        bannerData.value = rss.data.data;
+        chuDeList.value = rss.data.data;
 
         totalPage.value = rss.data.count;
         console.log(" totalPage.value", totalPage.value);
@@ -197,11 +199,11 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = bannerData.value.length
+  const firstIndex = chuDeList.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
   const lastIndex =
-    bannerData.value.length + currentPage.value * rowPerPage.value;
+    chuDeList.value.length + currentPage.value * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
 });
@@ -232,13 +234,11 @@ const handleOk = (e) => {
 };
 const deleteUser = async () => {
   try {
-    const deleteUsr = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_delete`,
-      {
-        id: idDelete.value,
-      }
-    );
-    if (deleteUsr.data.data == 1) {
+    console.log("idDelete.value", idDelete.value);
+    const deleteUsr = await request.post(`api/deleteChuDe.php`, {
+      id: idDelete.value,
+    });
+    if (deleteUsr.data.status) {
       fetchBanner();
       open.value = false;
       pushNotiSuccess();
@@ -260,22 +260,15 @@ const SearchUser = async () => {
 };
 
 // 👉 Add GPT
-const title = ref();
-const Url = ref();
-const Des = ref();
+const ChuDe = ref();
 const loadingAddUser = ref(false);
 const addUser = async () => {
   try {
     loadingAddUser.value = true;
-    const response = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_create`,
-      {
-        title: title.value,
-        url: Url.value,
-        des: Des.value,
-      }
-    );
-    if (response.data.data === 1) {
+    const response = await request.post(`api/addChuDe.php`, {
+      chuDe: ChuDe.value,
+    });
+    if (response.data.status) {
       loadingAddUser.value = false;
       isDialogVisible.value = false;
       fetchBanner();
@@ -293,7 +286,46 @@ const addUser = async () => {
   }
 };
 
-// 👉 Edit Banner
+// 👉 Add Sub chủ đề
+const isNewSub = ref(false);
+const selectChuDe = ref()
+const addSubChuDe = async () => {
+    loadingEdit.value = true;
+  //get chủ đề
+  try {
+    const res = await request.get(`api/getType.php?type=ChuDe`);
+    if (res.data.status) {
+      chuDeList.value = res.data.data.filter((item) => item.ChuDe !== "");
+      ListChuDe.value = chuDeList.value.map((item) => item.ChuDe);
+      isNewSub.value = true;
+      loadingEdit.value = false;
+    } else {
+      loadingEdit.value = false;
+    }
+  } catch (error) {
+    console.log(error);
+    loadingEdit.value = false;
+  }
+};
+const subChuDe= ref()
+const addSubChuDeFinal = async ()=>{
+    loadingAddUser.value = true;
+    const response = await request.post(`api/addSubChuDe.php`, {
+      chuDe: selectChuDe.value,
+      subChuDe: subChuDe.value
+    });
+    if (response.data.status) {
+      loadingAddUser.value = false;
+      isNewSub.value = false;
+      fetchBanner();
+      pushNotiSuccess();
+    } else {
+        isNewSub.value = false;
+      loadingAddUser.value = false;
+      pushNotiError();
+    }
+}
+// 👉 Edit Chủ đề
 const loadingEdit = ref(false);
 const isDialogEdit = ref(false);
 const Edit = ref({
@@ -396,9 +428,10 @@ onMounted(() => {
 
 <template>
   <section>
+    {{ chuDeList.value }}
     <div>
-      <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
-        <p>Bạn có chắc muốn xoá Banner này?</p>
+      <a-modal v-model:open="open" title="Delete Chủ đề" @ok="handleOk">
+        <p>Bạn có chắc muốn xoá Chủ đề này?</p>
       </a-modal>
     </div>
     <VRow>
@@ -441,7 +474,7 @@ onMounted(() => {
       </VCol>
 
       <VCol cols="12">
-        <VCard title="Quản lý Banner">
+        <VCard title="Quản lý Chủ đề">
           <VDivider />
 
           <VCardText class="d-flex flex-wrap gap-4">
@@ -450,9 +483,16 @@ onMounted(() => {
             <VSpacer />
 
             <div class="d-flex align-center">
-              <!-- 👉 Add Banner button -->
+              <!-- 👉 Add Chủ đề button -->
+              <VBtn
+                style="margin-right: 12px"
+                @click="addSubChuDe"
+              >
+                Add Sub Chủ đề
+              </VBtn>
+              <!-- 👉 Add Sub Chủ đề button -->
               <VBtn @click="isDialogVisible = !isDialogVisible">
-                Add Banner
+                Add Chủ đề
               </VBtn>
             </div>
           </VCardText>
@@ -466,7 +506,7 @@ onMounted(() => {
                   <VCheckbox
                     :model-value="selectAllUser"
                     :indeterminate="
-                      bannerData.length !== selectedRows.length &&
+                      chuDeList.length !== selectedRows.length &&
                       !!selectedRows.length
                     "
                     class="mx-1"
@@ -474,27 +514,15 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Title</th>
-                <th scope="col">Url</th>
-                <th scope="col">Description</th>
+                <th scope="col">Chủ đề</th>
+
                 <th scope="col">ACTIONS</th>
               </tr>
             </thead>
 
             <!-- 👉 table body -->
             <tbody>
-              <tr v-for="(user, index) in bannerData" :key="index">
-                <!-- 👉 Checkbox -->
-                <!-- <td>
-                  <VCheckbox
-                    :id="`check${user.id}`"
-                    :model-value="selectedRows.includes(`check${user.id}`)"
-                    class="mx-1"
-                    @click="addRemoveIndividualCheckbox(`check${user.id}`)"
-                  />
-                </td> -->
-
-                <!-- 👉 User -->
+              <tr v-for="(user, index) in ListChuDe" :key="index">
                 <td>
                   <div class="d-flex align-center">
                     {{ index + 1 }}
@@ -502,51 +530,15 @@ onMounted(() => {
                 </td>
                 <td>
                   <div class="d-flex align-center">
-                    <!-- <VAvatar
-                      variant="tonal"
-                      :color="resolveUserRoleVariant(user.role).color"
-                      class="me-3"
-                      size="34"
-                    >
-                      <VImg v-if="user.avatar" :src="user.avatar" />
-                      <span v-else class="text-sm">{{
-                        avatarText(user.user)
-                      }}</span>
-                    </VAvatar> -->
-
                     <div class="d-flex flex-column">
                       <h6 class="text-sm">
-                        <!-- <RouterLink
-                          :to="{
-                            name: 'apps-user-view-id',
-                            params: { id: user.id },
-                          }"
-                          class="font-weight-medium user-list-name"
-                        > -->
-                        {{ user.title }}
-                        <!-- </RouterLink> -->
+                        {{ user.ChuDe }}
                       </h6>
                     </div>
                   </div>
                 </td>
-
-                <!-- 👉 URL banner -->
-                <td>
-                  <span class="text-capitalize text-base">{{ user.url }}</span>
-                </td>
-
-                <!-- 👉 Description -->
-                <td>
-                  <span class="text-base text-high-emphasis">{{
-                    user.des
-                  }}</span>
-                </td>
-
                 <!-- 👉 Actions -->
                 <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
-                    <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
-                  </VBtn>
                   <VBtn color="error" @click="showModal(user.id)">
                     <VIcon icon="bx-trash" />
                   </VBtn>
@@ -556,7 +548,7 @@ onMounted(() => {
             </tbody>
 
             <!-- 👉 table footer  -->
-            <tfoot v-show="!bannerData.length">
+            <tfoot v-show="!ListChuDe.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
                   No data available
@@ -600,10 +592,10 @@ onMounted(() => {
       </VCol>
     </VRow>
 
-    <!-- 👉 Add New User -->
+    <!-- 👉 Add New Chủ đề -->
     <VDialog v-model="isDialogVisible" max-width="600">
       <!-- Dialog Content -->
-      <VCard title="Add New GPT">
+      <VCard title="Add Chủ Đề Mới">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -614,23 +606,9 @@ onMounted(() => {
           <VRow>
             <VCol cols="12">
               <VTextField
-                v-model="title"
-                label="Title"
+                v-model="ChuDe"
+                label="Tên chủ Đề "
                 :rules="[requiredValidator]"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextField
-                v-model="Url"
-                :rules="[requiredValidator]"
-                label="URL"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextField
-                v-model="Des"
-                :rules="[requiredValidator]"
-                label="Description"
               />
             </VCol>
           </VRow>
@@ -644,6 +622,42 @@ onMounted(() => {
             Close
           </VBtn>
           <VBtn @click="addUser"> Save </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+    <!-- 👉 Add Sub Chủ đề -->
+    <VDialog v-model="isNewSub" max-width="600">
+      <!-- Dialog Content -->
+      <VCard title="Add Sub Chủ Đề Mới">
+        <DialogCloseBtn variant="text" size="small" @click="isNewSub = false" />
+
+        <VCardText>
+          <VRow>
+            <VCol cols="12">
+              <VSelect
+                v-model="selectChuDe"
+                :items="ListChuDe"
+                label="Chủ đề"
+                persistent-hint
+                return-object
+                single-line
+              />
+
+            </VCol>
+            <VCol cols="12">
+                <VTextField
+                v-model="subChuDe"
+                label="SubChuDe"
+                :rules="[requiredValidator]"
+              />
+            </Vcol>
+          </VRow>
+        </VCardText>
+        <VCardText class="d-flex justify-end gap-2">
+          <VBtn color="secondary" variant="tonal" @click="isNewSub = false">
+            Close
+          </VBtn>
+          <VBtn @click="addSubChuDeFinal"> Save </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -662,7 +676,7 @@ onMounted(() => {
     <VDialog v-model="loadingEdit" width="300">
       <VCard color="primary" width="300">
         <VCardText class="pt-3">
-          Waiting for loading data banner.....
+          Waiting for loading data Chủ đề.....
           <VProgressLinear indeterminate class="mb-0" />
         </VCardText>
       </VCard>
