@@ -692,7 +692,7 @@ onMounted(() => {
     <!-- 👉 Edit New User -->
     <VDialog persistent v-model="isDialogEdit" max-width="600">
       <!-- Edit Dialog -->
-      <VCard title="Edit GPT Key">
+      <VCard title="Edit Banner">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -712,7 +712,7 @@ onMounted(() => {
               <VTextField
                 v-model="Edit.Url"
                 :rules="[requiredValidator]"
-                label="Key"
+                label="Url"
               />
             </VCol>
             <VCol cols="12">
