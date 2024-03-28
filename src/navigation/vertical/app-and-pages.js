@@ -1,7 +1,7 @@
 export default [
   { heading: 'Người dùng' },
   {
-    title: 'User',
+    title: 'Người dùng',
     icon: { icon: 'bx-user' },
     children: [
       { title: 'List', to: 'apps-user-list' },
@@ -49,12 +49,20 @@ export default [
 
     ],
   },
-  { heading: 'Báo cáo' },
+  { heading: 'Other' },
   {
-    title: 'Báo cáo',
+    title: 'Doanh thu',
     icon: { icon: 'bxs-report' },
     children: [
       { title: 'list', to: 'apps-report' },
+
+    ],
+  },
+  {
+    title: 'Đại lý',
+    icon: { icon: 'bxs-store' },
+    children: [
+      { title: 'list', to: 'apps-agency' },
 
     ],
   },

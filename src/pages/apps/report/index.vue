@@ -1,10 +1,9 @@
 <script setup>
+import ThongKe from "@/pages/components/thongke.vue";
 import request from "@/utils/request";
 import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { requiredValidator } from "@validators";
-import exportFromJSON from "export-from-json";
 import { onMounted, watch } from "vue";
-
 const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref();
@@ -14,64 +13,36 @@ const rowPerPage = ref(10);
 const currentPage = ref(0);
 const totalPage = ref(10);
 const totalUsers = ref(0);
-const bannerData = ref([]);
+const invoiceData = ref([]);
 const loading = ref(false);
 const apiKey = ref();
 const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
+const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+const role = ref()
+role.value = dataRole.level
 
-const userListMeta = [
-  {
-    icon: "bx-user",
-    color: "primary",
-    title: "Session",
-    stats: "21,459",
-    percentage: +29,
-    subtitle: "Total Users",
-  },
-  {
-    icon: "bx-user-plus",
-    color: "error",
-    title: "Paid Users",
-    stats: "4,567",
-    percentage: +18,
-    subtitle: "Last week analytics",
-  },
-  {
-    icon: "bx-user-check",
-    color: "success",
-    title: "Active Users",
-    stats: "19,860",
-    percentage: -14,
-    subtitle: "Last week analytics",
-  },
-  {
-    icon: "bx-user-voice",
-    color: "warning",
-    title: "Pending Users",
-    stats: "237",
-    percentage: +42,
-    subtitle: "Last week analytics",
-  },
-];
 const pageSize = ref(0);
 
 page.value = currentPage.value;
-// 👉 Fetching bannerData
-const fetchBanner = async () => {
+// 👉 Fetching invoiceData
+const fetchInvoice = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
+  
   await request
     .get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=banner_list`
+      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&action=list_bills`
     )
     .then((rss) => {
+    
       if (rss.data.status) {
-        bannerData.value = rss.data.data;
-        totalPage.value = rss.data.count;
+
+        invoiceData.value = rss.data.data.data;
+        totalPage.value = rss.data.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
         loading.value = false;
       }
@@ -79,12 +50,12 @@ const fetchBanner = async () => {
     })
     .catch((error) => {
       loading.value = false;
-      // console.log(error);
+      console.log(error);
     });
   selectedRole.value = "all";
   selectedPlan.value = "all";
 };
-// 👉 Fetching bannerData
+// 👉 Fetching invoiceData
 const fetchBannerPag = async (page) => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
@@ -95,8 +66,7 @@ const fetchBannerPag = async (page) => {
     )
     .then((rss) => {
       if (rss.data.success) {
-        bannerData.value = rss.data.data;
-
+        invoiceData.value = rss.data.data;
         totalPage.value = rss.data.count;
         console.log(" totalPage.value", totalPage.value);
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
@@ -120,77 +90,7 @@ watch(currentPage, (newVal, oldVal) => {
   fetchBannerPag(newVal);
 });
 
-// 👉 search filters
-const roles = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Quản trị viên",
-    value: "admin",
-  },
-  {
-    title: "Kiểm duyệt viên",
-    value: "author",
-  },
-  {
-    title: "Cộng tác viên",
-    value: "editor",
-  },
-  {
-    title: "Đại lý",
-    value: "maintainer",
-  },
-  {
-    title: "Subscriber",
-    value: "subscriber",
-  },
-]);
 
-const plans = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Basic",
-    value: "basic",
-  },
-  {
-    title: "Company",
-    value: "company",
-  },
-  {
-    title: "Enterprise",
-    value: "enterprise",
-  },
-  {
-    title: "Team",
-    value: "team",
-  },
-]);
-
-const status = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Pending",
-    value: "pending",
-  },
-  {
-    title: "Active",
-    value: "active",
-  },
-  {
-    title: "Inactive",
-    value: "inactive",
-  },
-]);
-
-const isAddNewUserDrawerVisible = ref(false);
 
 // 👉 watching current page
 watchEffect(() => {
@@ -199,11 +99,11 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = bannerData.value.length
+  const firstIndex = invoiceData.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
   const lastIndex =
-    bannerData.value.length + currentPage.value * rowPerPage.value;
+    invoiceData.value.length + currentPage.value * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
 });
@@ -241,7 +141,7 @@ const deleteUser = async () => {
       }
     );
     if (deleteUsr.data.data == 1) {
-      fetchBanner();
+      fetchInvoice();
       open.value = false;
       pushNotiSuccess();
     } else {
@@ -258,42 +158,9 @@ const deleteUser = async () => {
 // 👉 Search User
 const SearchUser = async () => {
   currentPage.value = 0;
-  fetchBanner();
+  fetchInvoice();
 };
 
-// 👉 Add GPT
-const title = ref();
-const Url = ref();
-const Des = ref();
-const loadingAddUser = ref(false);
-const addUser = async () => {
-  try {
-    loadingAddUser.value = true;
-    const response = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_create`,
-      {
-        title: title.value,
-        url: Url.value,
-        des: Des.value,
-      }
-    );
-    if (response.data.data === 1) {
-      loadingAddUser.value = false;
-      isDialogVisible.value = false;
-      fetchBanner();
-      pushNotiSuccess();
-    } else {
-      isDialogVisible.value = false;
-      loadingAddUser.value = false;
-      pushNotiError();
-    }
-  } catch (error) {
-    pushNotiError();
-    loadingAddUser.value = false;
-    isDialogVisible.value = false;
-    console.log(error);
-  }
-};
 
 // 👉 Edit Banner
 const loadingEdit = ref(false);
@@ -308,37 +175,8 @@ function resetEditValues() {
   Edit.value.Url = "";
   Edit.value.Des;
 }
-const idBannerEdit = ref();
-const showEdit = async (id) => {
-  resetEditValues();
-  idBannerEdit.value = id;
-  loadingEdit.value = true;
-  try {
-    const res = await request.get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&id=${idBannerEdit.value}&action=banner_list`
-    );
-    if (res.data.status) {
-      const data = res.data.data[0];
-      Edit.value.title = data.title;
-      Edit.value.Url = data.url;
-      Edit.value.Des = data.des;
-      loadingEdit.value = false;
-      isDialogEdit.value = true;
-    }
-    loadingEdit.value = false;
-  } catch (error) {
-    console.log(error);
-    loadingEdit.value = false;
-  }
-};
 
-const items = ref([
-  { label: "Admin", value: 0 },
-  { label: "Nhân viên", value: 1 },
-  { label: "Đại lý", value: 2 },
-  { label: "Cộng tác viên", value: 3 },
-  { label: "Người dùng", value: 4 },
-]);
+
 // watch(selectedItem, (newVal, oldVal)=>{
 //   console.log(newVal);
 // })
@@ -356,66 +194,46 @@ const pushNotiError = () => {
     notiError.value = false;
   }, 2000);
 };
-const SaveEdit = async () => {
-  try {
-    loadingAddUser.value = true;
-    const res = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_edit`,
-      {
-        id: idBannerEdit.value,
-        url: Edit.value.Url,
-        des: Edit.value.Des,
-        // user: Edit.value.ngayHetHan1,
-        // user: Edit.value.ngayDangKy1,
-      },
-      {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/x-www-form-urlencoded",
-      }
-    );
-    if (res.data.data == 1) {
-      isDialogEdit.value = false;
-      loadingAddUser.value = false;
-      pushNotiSuccess();
-      fetchBanner();
-    } else {
-      loadingAddUser.value = false;
-      isDialogEdit.value = false;
-      pushNotiError();
-    }
-  } catch (error) {
-    pushNotiError();
-    loadingAddUser.value = false;
-    console.log(error);
-    isDialogEdit.value = false;
-  }
-};
-const exportTable = ref()
-const ExportExcel = ()=>{
-  console.log("exportTable", exportTable.value);
-    const fileName = "np-data";
-  const data = bannerData.value;
-  for (const item of data) {
-  if (item.des) {
-    item.des = unescape(item.des);
-  }
-}
-console.log(data);
-  const exportType = exportFromJSON.types.csv;
-  if (data) exportFromJSON({ data, fileName, exportType });
-}
 
+// const exportTable = ref()
+// const ExportExcel = ()=>{
+//   console.log("exportTable", exportTable.value);
+//     const fileName = "np-data";
+//   const data = invoiceData.value;
+//   for (const item of data) {
+//   if (item.des) {
+//     item.des = unescape(item.des);
+//   }
+// }
+// console.log(data);
+//   const exportType = exportFromJSON.types.csv;
+//   if (data) exportFromJSON({ data, fileName, exportType });
+// }
 
 
 
 // 👉 OnMounted
 onMounted(() => {
-  fetchBanner();
+  try {
+    fetchInvoice();
+  } catch (error) {
+    console.log(error);
+  }
+
 });
 </script>
 
 <template>
-  <section>
+<section v-if="role==2">
+  <a-result status="500" title="401" sub-title="Bạn không có quyền truy cập trang này!">
+    <template #extra>
+    
+    </template>
+  </a-result>
+</section>
+
+
+  <section v-else>
     <!-- <table ref="exportTable">
       <tbody>
         <tr>
@@ -431,43 +249,7 @@ onMounted(() => {
       </a-modal>
     </div>
     <VRow>
-      <VCol
-        v-for="meta in userListMeta"
-        :key="meta.title"
-        cols="12"
-        sm="6"
-        lg="3"
-      >
-        <VCard>
-          <VCardText class="d-flex justify-space-between">
-            <div>
-              <span>{{ meta.title }}</span>
-              <div class="d-flex align-center gap-2">
-                <h6 class="text-h6">
-                  {{ meta.stats }}
-                </h6>
-                <span
-                  :class="meta.percentage > 0 ? 'text-success' : 'text-error'"
-                  class="text-sm"
-                  >({{
-                    meta.percentage > 0
-                      ? `+${meta.percentage}`
-                      : meta.percentage
-                  }}%)</span
-                >
-              </div>
-              <span class="text-sm">{{ meta.subtitle }}</span>
-            </div>
-
-            <VAvatar
-              rounded
-              variant="tonal"
-              :color="meta.color"
-              :icon="meta.icon"
-            />
-          </VCardText>
-        </VCard>
-      </VCol>
+      <ThongKe />
 
       <VCol cols="12">
         <VCard title="Quản lý Banner">
@@ -478,12 +260,7 @@ onMounted(() => {
 
             <VSpacer />
 
-            <div class="d-flex align-center">
-              <!-- 👉 Add Banner button -->
-              <VBtn @click="isDialogVisible = !isDialogVisible">
-                Add Banner
-              </VBtn>
-            </div>
+
             <div class="d-flex align-center">
               <!-- 👉 Add Banner button -->
               <VBtn @click="ExportExcel">
@@ -501,7 +278,7 @@ onMounted(() => {
                   <VCheckbox
                     :model-value="selectAllUser"
                     :indeterminate="
-                      bannerData.length !== selectedRows.length &&
+                      invoiceData.length !== selectedRows.length &&
                       !!selectedRows.length
                     "
                     class="mx-1"
@@ -509,16 +286,18 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Title</th>
-                <th scope="col">Url</th>
-                <th scope="col">Description</th>
-                <th scope="col">ACTIONS</th>
+                <th scope="col">Người dùng</th>
+                <th scope="col">Email</th>
+                <th scope="col">Gói đã mua</th>
+                <th scope="col">Giá</th>
+                <th scope="col">Ngày mua</th>
+                <!-- <th scope="col">ACTIONS</th> -->
               </tr>
             </thead>
 
             <!-- 👉 table body -->
             <tbody>
-              <tr v-for="(user, index) in bannerData" :key="index">
+              <tr v-for="(user, index) in invoiceData" :key="index">
                 <!-- 👉 Checkbox -->
                 <!-- <td>
                   <VCheckbox
@@ -532,7 +311,7 @@ onMounted(() => {
                 <!-- 👉 User -->
                 <td>
                   <div class="d-flex align-center">
-                    {{ index + 1 }}
+                   {{ index+1 }}
                   </div>
                 </td>
                 <td>
@@ -558,7 +337,7 @@ onMounted(() => {
                           }"
                           class="font-weight-medium user-list-name"
                         > -->
-                        {{ user.title }}
+                        {{ user.user }}
                         <!-- </RouterLink> -->
                       </h6>
                     </div>
@@ -567,31 +346,32 @@ onMounted(() => {
 
                 <!-- 👉 URL banner -->
                 <td>
-                  <span class="text-capitalize text-base">{{ user.url }}</span>
+                  <span class="text-capitalize text-base">{{ user.mail }}</span>
                 </td>
 
                 <!-- 👉 Description -->
                 <td>
                   <span class="text-base text-high-emphasis">{{
-                    user.des
+                    user.title_pack
                   }}</span>
                 </td>
-
-                <!-- 👉 Actions -->
-                <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
-                    <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
-                  </VBtn>
-                  <VBtn color="error" @click="showModal(user.id)">
-                    <VIcon icon="bx-trash" />
-                  </VBtn>
-                  <!-- <MoreBtn :menu-list="computedMoreList(user.id)" item-props /> -->
+                <td>
+                  <span class="text-base text-high-emphasis">{{
+                    user.money
+                  }}</span>
                 </td>
+                <td>
+                  <span class="text-base text-high-emphasis">{{
+                    user.createAt
+                  }}</span>
+                </td>
+                <!-- 👉 Actions -->
+              
               </tr>
             </tbody>
 
             <!-- 👉 table footer  -->
-            <tfoot v-show="!bannerData.length">
+            <tfoot v-show="!invoiceData.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
                   No data available

@@ -193,13 +193,11 @@ const autoScroll = () => {
 
     // Kiểm tra xem đã cuộn đến dưới cùng chưa
     if (
-      container.scrollTop + container.clientHeight >=
+      (container.scrollTop+1) + container.clientHeight >=
       container.scrollHeight
     ) {
       reachedBottom.value = true;
     }
-
-    console.log("Vẫn chạy");
   }, 500);
 };
 </script>

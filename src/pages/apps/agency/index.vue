@@ -12,80 +12,47 @@ const rowPerPage = ref(10);
 const currentPage = ref(0);
 const totalPage = ref(10);
 const totalUsers = ref(0);
-const bannerData = ref([]);
+const chuDeList = ref([]);
 const loading = ref(false);
 const apiKey = ref();
 const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
-const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-const role = ref()
-role.value = dataRole.level
 
-const userListMeta = [
-  {
-    icon: "bx-user",
-    color: "primary",
-    title: "Session",
-    stats: "21,459",
-    percentage: +29,
-    subtitle: "Total Users",
-  },
-  {
-    icon: "bx-user-plus",
-    color: "error",
-    title: "Paid Users",
-    stats: "4,567",
-    percentage: +18,
-    subtitle: "Last week analytics",
-  },
-  {
-    icon: "bx-user-check",
-    color: "success",
-    title: "Active Users",
-    stats: "19,860",
-    percentage: -14,
-    subtitle: "Last week analytics",
-  },
-  {
-    icon: "bx-user-voice",
-    color: "warning",
-    title: "Pending Users",
-    stats: "237",
-    percentage: +42,
-    subtitle: "Last week analytics",
-  },
-];
+
 const pageSize = ref(0);
 
 page.value = currentPage.value;
-// 👉 Fetching bannerData
-const fetchBanner = async () => {
+// 👉 Fetching chuDeList
+
+const ListChuDe = ref([]);
+const dataAgency = ref()
+const fetchAgency = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
-    .get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=banner_list`
-    )
+    .get(`api/admin/index.php?key=${apiKey.value}&action=list_all_agencies&page=${page.value}`)
     .then((rss) => {
+        console.log("vào đây chưa?", rss.data.status);
       if (rss.data.status) {
-        bannerData.value = rss.data.data;
+        dataAgency.value = rss.data.data
+        console.log("dataAgency.value", dataAgency.value);
         totalPage.value = rss.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
-        loading.value = false;
       }
       loading.value = false;
     })
     .catch((error) => {
       loading.value = false;
-      // console.log(error);
+      console.log(error);
     });
   selectedRole.value = "all";
   selectedPlan.value = "all";
 };
-// 👉 Fetching bannerData
+
+// 👉 Fetching chuDeList
 const fetchBannerPag = async (page) => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
@@ -96,7 +63,7 @@ const fetchBannerPag = async (page) => {
     )
     .then((rss) => {
       if (rss.data.success) {
-        bannerData.value = rss.data.data;
+        chuDeList.value = rss.data.data;
 
         totalPage.value = rss.data.count;
         console.log(" totalPage.value", totalPage.value);
@@ -122,76 +89,10 @@ watch(currentPage, (newVal, oldVal) => {
 });
 
 // 👉 search filters
-const roles = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Quản trị viên",
-    value: "admin",
-  },
-  {
-    title: "Kiểm duyệt viên",
-    value: "author",
-  },
-  {
-    title: "Cộng tác viên",
-    value: "editor",
-  },
-  {
-    title: "Đại lý",
-    value: "maintainer",
-  },
-  {
-    title: "Subscriber",
-    value: "subscriber",
-  },
-]);
 
-const plans = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Basic",
-    value: "basic",
-  },
-  {
-    title: "Company",
-    value: "company",
-  },
-  {
-    title: "Enterprise",
-    value: "enterprise",
-  },
-  {
-    title: "Team",
-    value: "team",
-  },
-]);
 
-const status = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Pending",
-    value: "pending",
-  },
-  {
-    title: "Active",
-    value: "active",
-  },
-  {
-    title: "Inactive",
-    value: "inactive",
-  },
-]);
 
-const isAddNewUserDrawerVisible = ref(false);
+
 
 // 👉 watching current page
 watchEffect(() => {
@@ -200,11 +101,11 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = bannerData.value.length
+  const firstIndex = chuDeList.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
   const lastIndex =
-    bannerData.value.length + currentPage.value * rowPerPage.value;
+    chuDeList.value.length + currentPage.value * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
 });
@@ -235,14 +136,12 @@ const handleOk = (e) => {
 };
 const deleteUser = async () => {
   try {
-    const deleteUsr = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_delete`,
-      {
-        id: idDelete.value,
-      }
-    );
-    if (deleteUsr.data.data == 1) {
-      fetchBanner();
+    console.log("idDelete.value", idDelete.value);
+    const deleteUsr = await request.post(`api/admin/index.php?key=${apiKey.value}&action=delete_agency`, {
+      id: idDelete.value,
+    });
+    if (deleteUsr.data.status) {
+      fetchAgency();
       open.value = false;
       pushNotiSuccess();
     } else {
@@ -259,70 +158,38 @@ const deleteUser = async () => {
 // 👉 Search User
 const SearchUser = async () => {
   currentPage.value = 0;
-  fetchBanner();
+  fetchAgency();
 };
 
-// 👉 Add GPT
-const title = ref();
-const Url = ref();
-const Des = ref();
-const loadingAddUser = ref(false);
-const addUser = async () => {
-  try {
-    loadingAddUser.value = true;
-    const response = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_create`,
-      {
-        title: title.value,
-        url: Url.value,
-        des: Des.value,
-      }
-    );
-    if (response.data.data === 1) {
-      loadingAddUser.value = false;
-      isDialogVisible.value = false;
-      fetchBanner();
-      pushNotiSuccess();
-    } else {
-      isDialogVisible.value = false;
-      loadingAddUser.value = false;
-      pushNotiError();
-    }
-  } catch (error) {
-    pushNotiError();
-    loadingAddUser.value = false;
-    isDialogVisible.value = false;
-    console.log(error);
-  }
-};
 
-// 👉 Edit Banner
+// 👉 Edit Agency
 const loadingEdit = ref(false);
 const isDialogEdit = ref(false);
 const Edit = ref({
-  title: "",
-  Url: "",
-  Des: "",
+    id_user: "",
+    maGioiThieu: "",
+    role: "",
 });
 function resetEditValues() {
-  Edit.value.title = "";
-  Edit.value.Url = "";
-  Edit.value.Des;
+  Edit.value.id_user = "";
+  Edit.value.maGioiThieu = "";
+  Edit.value.role;
 }
-const idBannerEdit = ref();
+const idAgencyEdit = ref();
+// const isIDUSER = ref()
 const showEdit = async (id) => {
   resetEditValues();
-  idBannerEdit.value = id;
+  idAgencyEdit.value = id;
   loadingEdit.value = true;
   try {
     const res = await request.get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&id=${idBannerEdit.value}&action=banner_list`
+      `api/admin/index.php?key=${apiKey.value}&id=${idAgencyEdit.value}&action=search_agency_by_id`
     );
     if (res.data.status) {
-      const data = res.data.data[0];
-      Edit.value.title = data.title;
-      Edit.value.Url = data.url;
-      Edit.value.Des = data.des;
+      const data = res.data.data;
+      Edit.value.id_user = data.id_user;
+      Edit.value.maGioiThieu = data.maGioiThieu;
+      Edit.value.role = data.role;
       loadingEdit.value = false;
       isDialogEdit.value = true;
     }
@@ -334,11 +201,8 @@ const showEdit = async (id) => {
 };
 
 const items = ref([
-  { label: "Admin", value: 0 },
-  { label: "Nhân viên", value: 1 },
-  { label: "Đại lý", value: 2 },
-  { label: "Cộng tác viên", value: 3 },
-  { label: "Người dùng", value: 4 },
+  { label: "Quyền 1", value: 1 },
+  { label: "Quyền 2", value: 2 },
 ]);
 // watch(selectedItem, (newVal, oldVal)=>{
 //   console.log(newVal);
@@ -361,11 +225,12 @@ const SaveEdit = async () => {
   try {
     loadingAddUser.value = true;
     const res = await request.post(
-      `api/admin/index.php?key=${apiKey.value}&action=banner_edit`,
+      `api/admin/index.php?key=${apiKey.value}&action=update_agency`,
       {
-        id: idBannerEdit.value,
-        url: Edit.value.Url,
-        des: Edit.value.Des,
+        id: idAgencyEdit.value,
+        id_user: Edit.value.id_user,
+        maGioiThieu: Edit.value.maGioiThieu,
+        role: Edit.value.role,
         // user: Edit.value.ngayHetHan1,
         // user: Edit.value.ngayDangKy1,
       },
@@ -374,11 +239,11 @@ const SaveEdit = async () => {
         "Content-Type": "application/x-www-form-urlencoded",
       }
     );
-    if (res.data.data == 1) {
+    if (res.data.status) {
       isDialogEdit.value = false;
       loadingAddUser.value = false;
       pushNotiSuccess();
-      fetchBanner();
+      fetchAgency();
     } else {
       loadingAddUser.value = false;
       isDialogEdit.value = false;
@@ -393,58 +258,23 @@ const SaveEdit = async () => {
 };
 // 👉 OnMounted
 onMounted(() => {
-  fetchBanner();
+  fetchAgency();
 });
 </script>
 
 <template>
   <section>
+    {{ chuDeList.value }}
     <div>
-      <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
-        <p>Bạn có chắc muốn xoá Banner này?</p>
+      <a-modal v-model:open="open" title="Delete Agency" @ok="handleOk">
+        <p>Bạn có chắc muốn xoá Agency này?</p>
       </a-modal>
     </div>
     <VRow>
-      <VCol
-        v-for="meta in userListMeta"
-        :key="meta.title"
-        cols="12"
-        sm="6"
-        lg="3"
-      >
-        <VCard>
-          <VCardText class="d-flex justify-space-between">
-            <div>
-              <span>{{ meta.title }}</span>
-              <div class="d-flex align-center gap-2">
-                <h6 class="text-h6">
-                  {{ meta.stats }}
-                </h6>
-                <span
-                  :class="meta.percentage > 0 ? 'text-success' : 'text-error'"
-                  class="text-sm"
-                  >({{
-                    meta.percentage > 0
-                      ? `+${meta.percentage}`
-                      : meta.percentage
-                  }}%)</span
-                >
-              </div>
-              <span class="text-sm">{{ meta.subtitle }}</span>
-            </div>
-
-            <VAvatar
-              rounded
-              variant="tonal"
-              :color="meta.color"
-              :icon="meta.icon"
-            />
-          </VCardText>
-        </VCard>
-      </VCol>
+   
 
       <VCol cols="12">
-        <VCard title="Quản lý Banner">
+        <VCard title="Quản lý Đại Lý">
           <VDivider />
 
           <VCardText class="d-flex flex-wrap gap-4">
@@ -453,10 +283,9 @@ onMounted(() => {
             <VSpacer />
 
             <div class="d-flex align-center">
-              <!-- 👉 Add Banner button -->
-              <VBtn @click="isDialogVisible = !isDialogVisible">
-                Add Banner
-              </VBtn>
+              <!-- 👉 Add Agency button -->
+     
+             
             </div>
           </VCardText>
           <VDivider />
@@ -469,7 +298,7 @@ onMounted(() => {
                   <VCheckbox
                     :model-value="selectAllUser"
                     :indeterminate="
-                      bannerData.length !== selectedRows.length &&
+                      chuDeList.length !== selectedRows.length &&
                       !!selectedRows.length
                     "
                     class="mx-1"
@@ -477,27 +306,16 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Title</th>
-                <th scope="col">Url</th>
-                <th scope="col">Description</th>
+                <th scope="col">Đai lý</th>
+                <th scope="col">Email</th>
+                <th scope="col">Mã giới thiệu</th>
                 <th scope="col">ACTIONS</th>
               </tr>
             </thead>
 
             <!-- 👉 table body -->
             <tbody>
-              <tr v-for="(user, index) in bannerData" :key="index">
-                <!-- 👉 Checkbox -->
-                <!-- <td>
-                  <VCheckbox
-                    :id="`check${user.id}`"
-                    :model-value="selectedRows.includes(`check${user.id}`)"
-                    class="mx-1"
-                    @click="addRemoveIndividualCheckbox(`check${user.id}`)"
-                  />
-                </td> -->
-
-                <!-- 👉 User -->
+              <tr v-for="(user, index) in dataAgency" :key="index">
                 <td>
                   <div class="d-flex align-center">
                     {{ index + 1 }}
@@ -505,61 +323,47 @@ onMounted(() => {
                 </td>
                 <td>
                   <div class="d-flex align-center">
-                    <!-- <VAvatar
-                      variant="tonal"
-                      :color="resolveUserRoleVariant(user.role).color"
-                      class="me-3"
-                      size="34"
-                    >
-                      <VImg v-if="user.avatar" :src="user.avatar" />
-                      <span v-else class="text-sm">{{
-                        avatarText(user.user)
-                      }}</span>
-                    </VAvatar> -->
-
                     <div class="d-flex flex-column">
                       <h6 class="text-sm">
-                        <!-- <RouterLink
-                          :to="{
-                            name: 'apps-user-view-id',
-                            params: { id: user.id },
-                          }"
-                          class="font-weight-medium user-list-name"
-                        > -->
-                        {{ user.title }}
-                        <!-- </RouterLink> -->
+                        {{ user.user }}
                       </h6>
                     </div>
                   </div>
                 </td>
-
-                <!-- 👉 URL banner -->
                 <td>
-                  <span class="text-capitalize text-base">{{ user.url }}</span>
+                  <div class="d-flex align-center">
+                    <div class="d-flex flex-column">
+                      <h6 class="text-sm">
+                        {{ user.mail }}
+                      </h6>
+                    </div>
+                  </div>
                 </td>
-
-                <!-- 👉 Description -->
                 <td>
-                  <span class="text-base text-high-emphasis">{{
-                    user.des
-                  }}</span>
+                  <div class="d-flex align-center">
+                    <div class="d-flex flex-column">
+                      <h6 class="text-sm">
+                        {{ user.maGioiThieu }}
+                      </h6>
+                    </div>
+                  </div>
                 </td>
-
                 <!-- 👉 Actions -->
                 <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
+                    <VBtn color="warning" style="margin-right: 8px">
                     <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
                   </VBtn>
                   <VBtn color="error" @click="showModal(user.id)">
                     <VIcon icon="bx-trash" />
                   </VBtn>
+                  
                   <!-- <MoreBtn :menu-list="computedMoreList(user.id)" item-props /> -->
                 </td>
               </tr>
             </tbody>
 
             <!-- 👉 table footer  -->
-            <tfoot v-show="!bannerData.length">
+            <tfoot v-show="!ListChuDe.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
                   No data available
@@ -603,53 +407,6 @@ onMounted(() => {
       </VCol>
     </VRow>
 
-    <!-- 👉 Add New User -->
-    <VDialog v-model="isDialogVisible" max-width="600">
-      <!-- Dialog Content -->
-      <VCard title="Add New GPT">
-        <DialogCloseBtn
-          variant="text"
-          size="small"
-          @click="isDialogVisible = false"
-        />
-
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <VTextField
-                v-model="title"
-                label="Title"
-                :rules="[requiredValidator]"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextField
-                v-model="Url"
-                :rules="[requiredValidator]"
-                label="URL"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextField
-                v-model="Des"
-                :rules="[requiredValidator]"
-                label="Description"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-        <VCardText class="d-flex justify-end gap-2">
-          <VBtn
-            color="secondary"
-            variant="tonal"
-            @click="isDialogVisible = false"
-          >
-            Close
-          </VBtn>
-          <VBtn @click="addUser"> Save </VBtn>
-        </VCardText>
-      </VCard>
-    </VDialog>
 
     <!-- Dialog loading -->
     <VDialog v-model="loadingAddUser" width="300">
@@ -665,7 +422,7 @@ onMounted(() => {
     <VDialog v-model="loadingEdit" width="300">
       <VCard color="primary" width="300">
         <VCardText class="pt-3">
-          Waiting for loading data banner.....
+          Waiting for loading data Agency.....
           <VProgressLinear indeterminate class="mb-0" />
         </VCardText>
       </VCard>
@@ -701,27 +458,24 @@ onMounted(() => {
 
         <VCardText>
           <VRow>
-            <!-- <VCol cols="12">
-              <VTextField
-                v-model="Edit.title"
-                :rules="[requiredValidator]"
-                label="Title"
-              />
-            </VCol> -->
             <VCol cols="12">
-              <VTextField
-                v-model="Edit.Url"
-                :rules="[requiredValidator]"
-                label="Key"
+                <VSelect
+                :items="items"
+                label="Chọn quyền"
+                v-model="Edit.role"
+                item-title="label"
+                item-value="value"
               />
             </VCol>
             <VCol cols="12">
               <VTextField
-                v-model="Edit.Des"
+                v-model="Edit.maGioiThieu"
                 :rules="[requiredValidator]"
-                label="Description"
+                label="Mã giới thiệu"
               />
             </VCol>
+            
+     
           </VRow>
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">

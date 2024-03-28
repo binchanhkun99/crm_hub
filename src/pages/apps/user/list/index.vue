@@ -1,9 +1,10 @@
 <script setup>
+
+import ThongKeUser from "@/pages/components/thongke.vue";
 import request from "@/utils/request";
 import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { emailValidator, requiredValidator } from "@validators";
 import { onMounted, watch } from "vue";
-import { UserOutlined, CloseOutlined } from "@ant-design/icons-vue";
 const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref();
@@ -20,49 +21,8 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
-const placements = [
-  "topLeft",
-  "top",
-  "topRight",
-  "bottomLeft",
-  "bottom",
-  "bottomRight",
-];
 
-const userListMeta = [
-  {
-    icon: "bx-user",
-    color: "primary",
-    title: "Session",
-    stats: "21,459",
-    percentage: +29,
-    subtitle: "Total Users",
-  },
-  {
-    icon: "bx-user-plus",
-    color: "error",
-    title: "Paid Users",
-    stats: "4,567",
-    percentage: +18,
-    subtitle: "Last week analytics",
-  },
-  {
-    icon: "bx-user-check",
-    color: "success",
-    title: "Active Users",
-    stats: "19,860",
-    percentage: -14,
-    subtitle: "Last week analytics",
-  },
-  {
-    icon: "bx-user-voice",
-    color: "warning",
-    title: "Pending Users",
-    stats: "237",
-    percentage: +42,
-    subtitle: "Last week analytics",
-  },
-];
+
 const pageSize = ref(0);
 
 page.value = currentPage.value;
@@ -113,7 +73,7 @@ const fetchUsersPag = async (page) => {
     })
     .catch((error) => {
       loading.value = false;
-      // console.log(error);
+      console.log(error);
     });
   selectedRole.value = "all";
   selectedPlan.value = "all";
@@ -632,43 +592,7 @@ onMounted(() => {
       </a-modal>
     </div>
     <VRow>
-      <VCol
-        v-for="meta in userListMeta"
-        :key="meta.title"
-        cols="12"
-        sm="6"
-        lg="3"
-      >
-        <VCard>
-          <VCardText class="d-flex justify-space-between">
-            <div>
-              <span>{{ meta.title }}</span>
-              <div class="d-flex align-center gap-2">
-                <h6 class="text-h6">
-                  {{ meta.stats }}
-                </h6>
-                <span
-                  :class="meta.percentage > 0 ? 'text-success' : 'text-error'"
-                  class="text-sm"
-                  >({{
-                    meta.percentage > 0
-                      ? `+${meta.percentage}`
-                      : meta.percentage
-                  }}%)</span
-                >
-              </div>
-              <span class="text-sm">{{ meta.subtitle }}</span>
-            </div>
-
-            <VAvatar
-              rounded
-              variant="tonal"
-              :color="meta.color"
-              :icon="meta.icon"
-            />
-          </VCardText>
-        </VCard>
-      </VCol>
+     <ThongKeUser />
 
       <VCol cols="12">
         <VCard title="Lọc người dùng">
