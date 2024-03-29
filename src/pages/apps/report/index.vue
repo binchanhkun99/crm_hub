@@ -4,6 +4,7 @@ import request from "@/utils/request";
 import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { requiredValidator } from "@validators";
 import { onMounted, watch } from "vue";
+
 const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref();
@@ -21,8 +22,8 @@ const show1 = ref(false);
 
 const isDialogVisible = ref(false);
 const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-const role = ref()
-role.value = dataRole.level
+const role = ref();
+role.value = dataRole.level;
 
 const pageSize = ref(0);
 
@@ -32,15 +33,13 @@ const fetchInvoice = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
-  
+
   await request
     .get(
       `api/admin/index.php?key=${apiKey.value}&page=${page.value}&action=list_bills`
     )
     .then((rss) => {
-    
       if (rss.data.status) {
-
         invoiceData.value = rss.data.data.data;
         totalPage.value = rss.data.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
@@ -89,8 +88,6 @@ watchEffect(() => {
 watch(currentPage, (newVal, oldVal) => {
   fetchBannerPag(newVal);
 });
-
-
 
 // 👉 watching current page
 watchEffect(() => {
@@ -161,7 +158,6 @@ const SearchUser = async () => {
   fetchInvoice();
 };
 
-
 // 👉 Edit Banner
 const loadingEdit = ref(false);
 const isDialogEdit = ref(false);
@@ -175,7 +171,6 @@ function resetEditValues() {
   Edit.value.Url = "";
   Edit.value.Des;
 }
-
 
 // watch(selectedItem, (newVal, oldVal)=>{
 //   console.log(newVal);
@@ -210,8 +205,6 @@ const pushNotiError = () => {
 //   if (data) exportFromJSON({ data, fileName, exportType });
 // }
 
-
-
 // 👉 OnMounted
 onMounted(() => {
   try {
@@ -219,19 +212,19 @@ onMounted(() => {
   } catch (error) {
     console.log(error);
   }
-
 });
 </script>
 
 <template>
-<section v-if="role==2">
-  <a-result status="500" title="401" sub-title="Bạn không có quyền truy cập trang này!">
-    <template #extra>
-    
-    </template>
-  </a-result>
-</section>
-
+  <section v-if="role == 2">
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
+  </section>
 
   <section v-else>
     <!-- <table ref="exportTable">
@@ -260,17 +253,17 @@ onMounted(() => {
 
             <VSpacer />
 
-
             <div class="d-flex align-center">
-              <!-- 👉 Add Banner button -->
-              <VBtn @click="ExportExcel">
+              <!-- 👉 Export -->
+              <VBtn color="primary" @click="ExportExcel">
+                <VIcon start icon="bx-cloud-upload" />
                 Export
               </VBtn>
             </div>
           </VCardText>
           <VDivider />
           <VProgressLinear v-if="loading" indeterminate color="primary" />
-          <VTable  class="text-no-wrap">
+          <VTable class="text-no-wrap">
             <!-- 👉 table head -->
             <thead>
               <tr>
@@ -311,7 +304,7 @@ onMounted(() => {
                 <!-- 👉 User -->
                 <td>
                   <div class="d-flex align-center">
-                   {{ index+1 }}
+                    {{ index + 1 }}
                   </div>
                 </td>
                 <td>
@@ -366,7 +359,6 @@ onMounted(() => {
                   }}</span>
                 </td>
                 <!-- 👉 Actions -->
-              
               </tr>
             </tbody>
 

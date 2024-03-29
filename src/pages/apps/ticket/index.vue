@@ -19,6 +19,66 @@ const idEmp = ref();
 var datalc = JSON.parse(localStorage.getItem("user")) || {};
 apiKey.value = datalc.key;
 idEmp.value = datalc.id;
+const fullTicket = ref();
+const getTicketAll = async () => {
+  loadingData.value = true;
+
+  await request
+    .get(
+      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=cskh_list_all`
+    )
+    .then((res) => {
+      loadingData.value = false;
+      fullTicket.value = res.data.data.reverse();
+    })
+    .catch((err) => {
+      console.log(err);
+      loadingData.value = false;
+    });
+};
+const open = ref()
+const closeTkID = ref()
+const closeTicket = (id) =>{
+open.value = true
+closeTkID.value = id
+}
+const notiSuccess = ref(false);
+const notiError = ref(false);
+const pushNotiSuccess = () => {
+  notiSuccess.value = true;
+  setTimeout(() => {
+    notiSuccess.value = false;
+  }, 2000);
+};
+const pushNotiError = () => {
+  notiError.value = true;
+  setTimeout(() => {
+    notiError.value = false;
+  }, 2000);
+};
+const handleOk = async ()=>{
+  try {
+    const deleteUsr = await request.post(
+      `api/admin/index.php?key=${apiKey.value}&action=update_status_cskh`,
+      {
+        ticket_id:  tkId.value,
+        new_status: 4
+      }
+    );
+    if (deleteUsr.data.data == 1) {
+      getbyNhanVien();
+      open.value = false;
+      pushNotiSuccess();
+    } else {
+      pushNotiError();
+      open.value = false;
+    }
+  } catch (error) {
+    open.value = false;
+    pushNotiError();
+    console.log(error);
+  }
+}
 const getAllTicket = async () => {
   loadingData.value = true;
 
@@ -100,12 +160,16 @@ const sendMessage = async () => {
 
 watch(currentTab, (newVal, oldVal) => {
   if (newVal == "two") {
-    detailTicketData.value =null;
+    detailTicketData.value = null;
     getbyNhanVien();
   }
   if (newVal == "one") {
-    detailTicketData.value =null;
+    detailTicketData.value = null;
     getAllTicket();
+  }
+  if (newVal == "three") {
+    detailTicketData.value = null;
+    getTicketAll();
   }
 });
 const reachedBottom = ref(false); // Biến để xác định khi cuộn đến dưới cùng
@@ -193,7 +257,7 @@ const autoScroll = () => {
 
     // Kiểm tra xem đã cuộn đến dưới cùng chưa
     if (
-      (container.scrollTop+1) + container.clientHeight >=
+      container.scrollTop + 1 + container.clientHeight >=
       container.scrollHeight
     ) {
       reachedBottom.value = true;
@@ -203,57 +267,38 @@ const autoScroll = () => {
 </script>
 <template>
   <section>
+    <div>
+      <a-modal v-model:open="open" title="Đóng Ticket" @ok="handleOk">
+        <p>Bạn có chắc đóng Ticket này?</p>
+      </a-modal>
+    </div>
     <VTabs v-model="currentTab" class="v-tabs-pill">
-      <VTab style="width: 120px" value="one">Tickets Open</VTab>
+      <VTab style="width: 125px" value="one">Tickets Open</VTab>
       <VTab style="width: 120px" value="two">My Ticket</VTab>
+      <VTab style="width: 125px" value="three">Tất cả Ticket</VTab>
     </VTabs>
 
     <VWindow v-model="currentTab" class="mt-5">
       <VWindowItem value="one">
         <VRow>
-          <VCol cols="3" sm="3">
-            <VAlert type="info" style="cursor: pointer;
-            margin-bottom: 6px;"  v-for="(item, index) in allTicketDataNew"
-                :key="index" @click="getTicketByID(item.id, item.user_TK)">
-    <strong>{{ item.title }}</strong> 
-    </VAlert>
-            <!-- <div class="list">
-        
-              <div
-                class="box"
-              
-              >
-                <div class="icon">
-                  <VIcon
-                    v-if="item.status == 4"
-                    color="success"
-                    icon="bx-check"
-                  />
-                  <VIcon
-                    v-if="item.status == 1"
-                    color="warning"
-                    icon="bx-message-rounded-dots"
-                  />
-                  <VIcon
-                    v-if="item.status == 2"
-                    color="info"
-                    icon="bx-user-voice"
-                  />
-                </div>
-          
-                <div
-                  class="content"
-                  @click="getTicketByID(item.id, item.user_TK)"
-                >
-                  <p class="text">{{ item.title }}</p>
-          
-                </div>
-              </div>
-            </div> -->
+          <VCol cols="3" sm="3" style="height: 638px; overflow: auto">
+            <VAlert
+              type="info"
+              style="cursor: pointer; margin-bottom: 6px"
+              v-for="(item, index) in allTicketDataNew"
+              :key="index"
+              @click="getTicketByID(item.id, item.user_TK)"
+            >
+              <strong>{{ item.title }}</strong>
+            </VAlert>
           </VCol>
           <VCol cols="9" sm="9">
             <div v-if="!detailTicketData">
-              <a-result status="403" title="Open Ticket" sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng"></a-result> 
+              <a-result
+                status="403"
+                title="Open Ticket"
+                sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng"
+              ></a-result>
             </div>
 
             <div v-if="detailTicketData" class="supprt">
@@ -304,48 +349,97 @@ const autoScroll = () => {
       <!-- Tab thứ 2 -->
       <VWindowItem value="two">
         <VRow>
-          <VCol cols="3" sm="3">
-            <VAlert type="success" style="cursor: pointer; margin-bottom: 6px;"   v-for="(item, index) in dataByNhanVien"
-                :key="index"  @click="getTicketByID(item.cskh_id, item.taikhoan_user)">
-    <strong>{{ item.cskh_title }}</strong> 
-    </VAlert>
-            <!-- <div class="list">
-              <div
-                class="box"
-                v-for="(item, index) in dataByNhanVien"
-                :key="index"
-              >
-                <div class="icon">
-                  <VIcon
-                    v-if="item.cskh_status == 4"
-                    color="success"
-                    icon="bx-check"
-                  />
-                  <VIcon
-                    v-if="item.cskh_status == 1"
-                    color="warning"
-                    icon="bx-message-rounded-dots"
-                  />
-                  <VIcon
-                    v-if="item.cskh_status == 2"
-                    color="info"
-                    icon="bx-user-voice"
-                  />
-                </div>
-                <div
-                  class="content"
-                  @click="getTicketByID(item.cskh_id, item.taikhoan_user)"
-                >
-                  <p class="text">{{ item.cskh_title }}</p>
-                </div>
-              </div>
-            </div> -->
+          <VCol cols="3" sm="3" style="height: 638px; overflow: auto">
+            <VAlert
+              color="secondary"
+              icon="bxl-whatsapp"
+              style="cursor: pointer; margin-bottom: 6px"
+              v-for="(item, index) in dataByNhanVien"
+              :key="index"
+              @click="getTicketByID(item.cskh_id, item.taikhoan_user)"
+            >
+              <strong>{{ item.cskh_title }}</strong>
+            </VAlert>
           </VCol>
           <VCol cols="9" sm="9">
             <div v-if="!detailTicketData">
-              <a-result status="403" title="Open Ticket" sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng">
-   
-  </a-result>
+              <a-result
+                status="403"
+                title="Open Ticket"
+                sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng"
+              >
+              </a-result>
+            </div>
+            <VBtn @click="closeTicket()" v-if="detailTicketData">
+              Đóng
+              <VIcon end icon="bx-check-circle" />
+            </VBtn>
+            <div v-if="detailTicketData" ref="testDOM" class="supprt-scroll">
+              <h3>Trả lời ticket</h3>
+              <!-- <a-skeleton v-if="loadingAsk" active /> -->
+
+              <a-card
+                :title="item.role == 'admin' ? 'Admin' : UserName"
+                :bordered="false"
+                v-for="(item, index) of detailTicketData"
+                :key="index"
+              >
+                <p>{{ item.message }}</p>
+              </a-card>
+              <div
+                style="
+                  width: 100%;
+                  display: flex;
+                  height: auto;
+                  gap: 8px;
+                  align-items: center;
+                "
+              >
+                <VTextField
+                  v-model="message"
+                  clearable
+                  type="text"
+                  label="Message"
+                  color="primary"
+                  clear-icon="bx-x-circle"
+                  append-icon=""
+                  @click:clear="clearMessage"
+                >
+                </VTextField>
+
+                <VBtn
+                  style="width: 40px"
+                  color="success"
+                  @click="sendMessageByNhanVien()"
+                >
+                  <VIcon icon="bx-send" />
+                </VBtn>
+              </div></div
+          ></VCol>
+        </VRow>
+      </VWindowItem>
+      <!-- Tab thứ 3 -->
+      <VWindowItem value="three">
+        <VRow>
+          <VCol cols="3" sm="3" style="height: 638px; overflow: auto">
+            <VAlert
+              type="success"
+              style="cursor: pointer; margin-bottom: 6px"
+              v-for="(item, index) in fullTicket"
+              :key="index"
+              @click="getTicketByID(item.id, item.user_TK)"
+            >
+              <strong>{{ item.title }}</strong>
+            </VAlert>
+          </VCol>
+          <VCol cols="9" sm="9">
+            <div v-if="!detailTicketData">
+              <a-result
+                status="403"
+                title="Open Ticket"
+                sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng"
+              >
+              </a-result>
             </div>
 
             <div v-if="detailTicketData" ref="testDOM" class="supprt-scroll">
@@ -401,6 +495,23 @@ const autoScroll = () => {
           Waiting for loading data.....
           <VProgressLinear indeterminate class="mb-0" />
         </VCardText>
+      </VCard>
+    </VDialog>
+    <!-- Success-->
+    <VDialog v-model="notiSuccess" width="300">
+      <VCard color="primary" width="300">
+        <VAlert type="success">
+          <strong>Thành công</strong>
+        </VAlert>
+      </VCard>
+    </VDialog>
+
+    <!-- Error-->
+    <VDialog v-model="notiError" width="300">
+      <VCard color="primary" width="300">
+        <VAlert type="error">
+          <strong>Đã có lỗi xẩy ra vui lòng thử lại sau</strong>
+        </VAlert>
       </VCard>
     </VDialog>
   </section>

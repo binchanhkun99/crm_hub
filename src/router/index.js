@@ -40,7 +40,6 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const publicPages = ["/login", "/home"];
-  console.log("to.path", to.path) 
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem("user");
   console.log("loggedIn",loggedIn) 
