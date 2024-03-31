@@ -200,8 +200,11 @@ const ExportExcel = async () => {
   console.log('stDate', stDate.value);
   try {
     const res = request.posst(`https://api-test.aidu.com.vn/api/admin/index.php?key=hrlvsfk8reh220jt30ui0muevl&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`)
+    if(res.data.status){
+      window.open("https://api-test.aidu.com.vn/api/admin/baocaodulieu.xlsx", "_blank");
+    }
   } catch (error) {
-    
+    console.log(error);
   }
   //   console.log("exportTable", exportTable.value);
   //     const fileName = "np-data";
@@ -231,7 +234,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section v-if="role == 2">
+  <section v-if="role!=0">
     <a-result
       status="500"
       title="401"

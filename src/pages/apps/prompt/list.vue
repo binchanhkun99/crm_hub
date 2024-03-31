@@ -21,6 +21,11 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
+const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+
+const role = ref();
+role.value = dataRole.level;
+
 
 const userListMeta = [
   {
@@ -623,6 +628,15 @@ onMounted(async () => {
 </script>
 
 <template>
+    <section v-if="role!=0">
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
+  </section>
   <section>
     <div>
       <a-modal v-model:open="open" title="Delete Prompt" @ok="handleOk">

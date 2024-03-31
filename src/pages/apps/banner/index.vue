@@ -364,6 +364,15 @@ onMounted(() => {
 </script>
 
 <template>
+    <section v-if="role!=0">
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
+  </section>
   <section>
     <div>
       <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">

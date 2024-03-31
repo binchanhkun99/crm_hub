@@ -7,6 +7,9 @@ import dfs from "@images/logos/Stable_Diffusion_logo_2b68efd6c7.png";
 
 const selectAI = ref();
 const Resolution = ref();
+const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+const role = ref();
+role.value = dataRole.level;
 // watch()
 const apiKey = ref();
 const fetchConfig = async () => {
@@ -60,6 +63,16 @@ onMounted(() => {
 </script>
 
 <template>
+    <section v-if="role!=0">
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
+  </section>
+
   <section>
     <VCol cols="12">
       <VCard title="Edit Config IMAGE">
