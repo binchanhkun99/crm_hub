@@ -66,7 +66,6 @@ const fetchBannerPag = async (page) => {
         bannerData.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }

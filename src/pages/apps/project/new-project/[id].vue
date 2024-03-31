@@ -37,13 +37,11 @@ const generateObjectId = () => {
   if (userString) {
     const userObject = JSON.parse(userString);
     const payload = userObject.payload;
-    console.log("payload", payload);
     const timestamp = Date.now();
     const object_id = `${payload.user_id}_${timestamp}`;
     return object_id;
   } else {
     // Xử lý khi không có dữ liệu trong localStorage
-    console.log('errr')
     return null;
   }
 };
@@ -75,7 +73,7 @@ const getSubject = async () => {
     );
     if (res.data.status === true) {
       dataSubject.value = res.data.data;
-      console.log("ksjdsjdsfjdfsa____", dataSubject.value);
+
       showForm.value = 0;
     }
   } catch (error) {

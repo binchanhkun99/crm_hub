@@ -96,7 +96,7 @@ const fetchBannerPag = async (page) => {
         discountData.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
+      
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }

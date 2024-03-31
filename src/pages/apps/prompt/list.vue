@@ -100,7 +100,6 @@ const fetchPackagePag = async (page) => {
         dataPrompt.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -345,10 +344,9 @@ const saveForm = async () => {
         "Content-Type": "application/x-www-form-urlencoded",
       }
     );
-    console.log("response__", response.data.status);
+
     if (response.data.status == "success") {
       dynamicAll.valuel = [];
-      console.log("ÔKKOOKOKO");
       loadingAddUser.value = false;
       isDialogVisible.value = false;
       fetchPackage();
@@ -367,9 +365,6 @@ const saveForm = async () => {
   }
 };
 const onFinish = async (values) => {
-  console.log("Received values of form:", values);
-
-  console.log("dynamicValidateForm.input:", dynamicValidateForm.input);
   formRef.value.submit();
 };
 const beforEdit = async () => {
@@ -516,9 +511,9 @@ const showEdit = async (id) => {
       Edit.value.trangThai = data.trangThai;
       // Edit.value.input = dl;
       const DI = JSON.parse(data.input);
-      console.log(typeof data.input)// log ra string
+   
       Edit.value.input = DI;
-      console.log("DI_____", DI);
+    
       // if (data.inputType == "select") {
       //   DI.map((item) => {
       //     dynamicSelectEdit.select.push({

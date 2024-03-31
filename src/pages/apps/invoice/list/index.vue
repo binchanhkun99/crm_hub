@@ -96,7 +96,6 @@ const fetchGPTPag = async (page) => {
         gptData.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -168,7 +167,7 @@ const deleteUser = async () => {
         id: idDelete.value,
       }
     );
-    console.log("deleteUsr.data.data", deleteUsr.data.data);
+  
     if (deleteUsr.data.data == 1) {
       fetchGPT();
       open.value = false;

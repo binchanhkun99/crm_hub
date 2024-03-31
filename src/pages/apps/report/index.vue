@@ -67,7 +67,6 @@ const fetchBannerPag = async (page) => {
       if (rss.data.success) {
         invoiceData.value = rss.data.data;
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -190,20 +189,36 @@ const pushNotiError = () => {
   }, 2000);
 };
 
-// const exportTable = ref()
-// const ExportExcel = ()=>{
-//   console.log("exportTable", exportTable.value);
-//     const fileName = "np-data";
-//   const data = invoiceData.value;
-//   for (const item of data) {
-//   if (item.des) {
-//     item.des = unescape(item.des);
-//   }
-// }
-// console.log(data);
-//   const exportType = exportFromJSON.types.csv;
-//   if (data) exportFromJSON({ data, fileName, exportType });
-// }
+const exportTable = ref();
+const stDate = ref()
+const endDate = ref()
+const ExportExcel = async () => {
+  if(!stDate.value || !endDate.value){
+    alert("Thời gian không được để trống!")
+    return;
+  }
+  console.log('stDate', stDate.value);
+  try {
+    const res = request.posst(`https://api-test.aidu.com.vn/api/admin/index.php?key=hrlvsfk8reh220jt30ui0muevl&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`)
+  } catch (error) {
+    
+  }
+  //   console.log("exportTable", exportTable.value);
+  //     const fileName = "np-data";
+  //   const data = invoiceData.value;
+  //   for (const item of data) {
+  //   if (item.des) {
+  //     item.des = unescape(item.des);
+  //   }
+  // }
+  // console.log(data);
+  //   const exportType = exportFromJSON.types.csv;
+  //   if (data) exportFromJSON({ data, fileName, exportType });
+  const deleteUsr = await request.get(
+    `api/admin/index.php?key=${apiKey.value}&action=export_excel`,
+   
+  );
+};
 
 // 👉 OnMounted
 onMounted(() => {
@@ -245,12 +260,27 @@ onMounted(() => {
       <ThongKe />
 
       <VCol cols="12">
+        
         <VCard title="Quản lý Banner">
           <VDivider />
-
-          <VCardText class="d-flex flex-wrap gap-4">
+<VRow>
+  <VCol cols="4" style="margin-top: 8px; position: relative;
+    left: 10px;">
+              <AppDateTimePicker
+                v-model="stDate"
+                label="Thời gian bắt đầu"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+            /></VCol>
+            <VCol cols="4" style="margin-top: 8px;">
+              <AppDateTimePicker
+                v-model="endDate"
+                label="Thời gian kết thúc"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+            /></VCol>
+            <VCol cols="4">
+            <VCardText class="d-flex flex-wrap gap-4">
             <!-- 👉 Export button -->
-
+            
             <VSpacer />
 
             <div class="d-flex align-center">
@@ -261,6 +291,10 @@ onMounted(() => {
               </VBtn>
             </div>
           </VCardText>
+        </VCol>
+</Vrow>
+          
+
           <VDivider />
           <VProgressLinear v-if="loading" indeterminate color="primary" />
           <VTable class="text-no-wrap">

@@ -1,5 +1,4 @@
 <script setup>
-
 import ThongKeUser from "@/pages/components/thongke.vue";
 import request from "@/utils/request";
 import { useUserListStore } from "@/views/apps/user/useUserListStore";
@@ -21,7 +20,6 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
-
 
 const pageSize = ref(0);
 
@@ -159,19 +157,17 @@ const status = ref([
 
 const isAddNewUserDrawerVisible = ref(false);
 
-// 👉 watching current page
-watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
+
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
+
   const firstIndex = users.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
   const lastIndex = users.value.length + currentPage.value * rowPerPage.value;
 
-  return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
+  return `${firstIndex}-${lastIndex} of ${totalPage.value}`;
 });
 
 // SECTION Checkbox toggle
@@ -218,16 +214,46 @@ const SearchUser = async () => {
 
 // 👉 Add User
 const maGioiThieuAdd = ref();
+const maGioiThieuDaiLy = ref();
+const quyenUser = ref();
 const loadingAddUser = ref(false);
 const userName = ref();
 const password = ref("");
 const email = ref("");
+const items = ref([
+  { label: "Admin", value: 0 },
+  { label: "Nhân viên", value: 1 },
+  { label: "Đại lý", value: 2 },
+  { label: "Cộng tác viên", value: 3 },
+  { label: "Người dùng", value: 4 },
+]);
 const addUser = async () => {
+  let objmgt = {};
+  if (quyenUser.value == 2 || quyenUser.value == 3) {
+    if (!maGioiThieuDaiLy.value) {
+      alert("Mã giới thiệu không được để trống!");
+      return;
+    } else {
+      objmgt = {
+        maGioiThieu: maGioiThieuDaiLy.value,
+      };
+    }
+  } else {
+    if (!maGioiThieuAdd.value) {
+      alert("Mã giới thiệu không được để trống!");
+      return;
+    } else {
+      objmgt = {
+        maGioiThieu: maGioiThieuAdd.value,
+      };
+    }
+  }
   let dataForm = new FormData();
   dataForm.append("user", userName.value);
   dataForm.append("pass", password.value);
   dataForm.append("mail", email.value);
-  dataForm.append("maGioiThieu", maGioiThieuAdd.value);
+  dataForm.append("maGioiThieu", objmgt.maGioiThieu);
+  dataForm.append("role", quyenUser.value);
   try {
     loadingAddUser.value = true;
     const response = await request.post("api/reg_acc.php", dataForm);
@@ -252,6 +278,7 @@ const addUser = async () => {
 // 👉 Edit User
 const loadingEdit = ref(false);
 const isDialogEdit = ref(false);
+const AgencyMGT = ref();
 const Edit = ref({
   email1: "",
   userName1: "",
@@ -260,6 +287,7 @@ const Edit = ref({
   ngayDangKy1: "",
   ngayHetHan1: "",
   goiDangKy1: "",
+  AgencyMGT: "",
 });
 function resetEditValues() {
   Edit.value.email1 = "";
@@ -273,6 +301,27 @@ function resetEditValues() {
 }
 const idUserEdit = ref();
 const selectedQuyen = ref();
+const addMgtDaily = async () => {
+  try {
+    loadingAddUser.value = true;
+    const res = await request.post(
+      `api/admin/index.php?key=${apiKey.value}&action=add_agency`,
+      {
+        id_user: idUserEdit.value,
+        maGioiThieu: AgencyMGT.value,
+        role: selectedQuyen == 2 ? 0 : 1,
+      }
+    );
+    if (res.data.status) {
+      loadingAddUser.value = false;
+      pushNotiSuccess();
+    }
+  } catch (error) {
+    pushNotiError();
+    loadingAddUser = false;
+    console.log(error);
+  }
+};
 const showEdit = async (id) => {
   resetEditValues();
   idUserEdit.value = id;
@@ -283,6 +332,8 @@ const showEdit = async (id) => {
     );
     if (res.data.status) {
       const data = res.data.data;
+
+      console.log(data.user);
       Edit.value.email1 = data.user.mail;
       Edit.value.userName1 = data.user.user;
       Edit.value.password1 = "";
@@ -290,6 +341,7 @@ const showEdit = async (id) => {
       Edit.value.ngayDangKy1 = data.user.thoiGianDangKy;
       Edit.value.ngayHetHan1 = data.user.thoiGianHetHan;
       selectedQuyen.value = data.user.level;
+      AgencyMGT.value = data.user.acency?.maGioiThieu;
       Edit.value.goiDangKy1 = data.service || "Chưa đăng ký dịch vụ nào";
       loadingEdit.value = false;
       isDialogEdit.value = true;
@@ -300,13 +352,6 @@ const showEdit = async (id) => {
   }
 };
 
-const items = ref([
-  { label: "Admin", value: 0 },
-  { label: "Nhân viên", value: 1 },
-  { label: "Đại lý", value: 2 },
-  { label: "Cộng tác viên", value: 3 },
-  { label: "Người dùng", value: 4 },
-]);
 // watch(selectedItem, (newVal, oldVal)=>{
 //   console.log(newVal);
 // })
@@ -349,7 +394,7 @@ const SaveEdit = async () => {
       pushNotiSuccess();
       await request
         .get(
-          `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&id_user=${idUserEdit.value}`
+          `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}`
         )
         .then((rss) => {
           if (rss.data.success) {
@@ -541,38 +586,37 @@ const addNewServiceForUser = async () => {
       pushNotiError();
     });
 };
-const openDeleteSv = ref(false)
-const idDeletePaCk = ref()
-const beforeDelete = (id)=>{
-  idDeletePaCk.value = id
-  openDeleteSv.value = true
-}
-const DeletePack = async ()=>{
+const openDeleteSv = ref(false);
+const idDeletePaCk = ref();
+const beforeDelete = (id) => {
+  idDeletePaCk.value = id;
+  openDeleteSv.value = true;
+};
+const DeletePack = async () => {
   var data = JSON.parse(localStorage.getItem("user")) || {};
 
-apiKey.value = data.key;
-await request
-  .post(`api/admin/index.php?key=${apiKey.value}&action=delete_service`, {
-    id: idDeletePaCk.value,
-   
-  })
-  .then((rss) => {
-    if (rss.data.status) {
-      pushNotiSuccess();
-      fetchUsers();
-      openDeleteSv.value = false;
+  apiKey.value = data.key;
+  await request
+    .post(`api/admin/index.php?key=${apiKey.value}&action=delete_service`, {
+      id: idDeletePaCk.value,
+    })
+    .then((rss) => {
+      if (rss.data.status) {
+        pushNotiSuccess();
+        fetchUsers();
+        openDeleteSv.value = false;
+        loadingAddUser.value = false;
+      }
+      loading.value = false;
       loadingAddUser.value = false;
-    }
-    loading.value = false;
-    loadingAddUser.value = false;
-  })
-  .catch((error) => {
-    loading.value = false;
-    loadingAddUser.value = false;
-    console.log(error);
-    pushNotiError();
-  });
-}
+    })
+    .catch((error) => {
+      loading.value = false;
+      loadingAddUser.value = false;
+      console.log(error);
+      pushNotiError();
+    });
+};
 // 👉 OnMounted
 onMounted(() => {
   fetchUsers();
@@ -592,7 +636,7 @@ onMounted(() => {
       </a-modal>
     </div>
     <VRow>
-     <ThongKeUser />
+      <ThongKeUser />
 
       <VCol cols="12">
         <VCard title="Lọc người dùng">
@@ -779,7 +823,10 @@ onMounted(() => {
                     <VIcon icon="bx-dots-vertical-rounded" />
                     <template #overlay>
                       <a-menu>
-                        <a-menu-item key="0" v-if="!user.services[0]?.pack_title">
+                        <a-menu-item
+                          key="0"
+                          v-if="!user.services[0]?.pack_title"
+                        >
                           <VBtn color="success" @click="NewService(user.id)">
                             <VIcon icon="bx-folder-plus" />
                           </VBtn>
@@ -788,12 +835,18 @@ onMounted(() => {
                           <VBtn color="warning" @click="EditService(user.id)">
                             <VIcon icon="bx-edit-alt" />
                           </VBtn>
-                        </a-menu-item >
-                        <a-menu-item key="2" v-if="user.services[0]?.pack_title">
-                        <VBtn @click="beforeDelete(user.services[0]?.id)" color="error">
-                          <VIcon  icon="bx-trash" />
-                        </VBtn>
-                      </a-menu-item >
+                        </a-menu-item>
+                        <a-menu-item
+                          key="2"
+                          v-if="user.services[0]?.pack_title"
+                        >
+                          <VBtn
+                            @click="beforeDelete(user.services[0]?.id)"
+                            color="error"
+                          >
+                            <VIcon icon="bx-trash" />
+                          </VBtn>
+                        </a-menu-item>
                       </a-menu>
                     </template>
                   </a-dropdown>
@@ -806,8 +859,12 @@ onMounted(() => {
 
                 <!-- 👉 Actions -->
                 <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
-                    <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
+                  <VBtn
+                    @click="showEdit(user.id)"
+                    color="warning"
+                    style="margin-right: 8px"
+                  >
+                    <VIcon icon="bxs-edit" />
                   </VBtn>
                   <VBtn color="error" @click="showModal(user.id)">
                     <VIcon icon="bx-trash" />
@@ -1002,8 +1059,23 @@ onMounted(() => {
                 @click:append-inner="show1 = !show1"
               />
             </VCol>
-
             <VCol cols="12">
+              <VSelect
+                v-model="quyenUser"
+                :items="items"
+                label="Quyền"
+                item-title="label"
+                item-value="value"
+              />
+            </VCol>
+            <VCol cols="12" v-if="quyenUser == 2 || quyenUser == 3">
+              <VTextField
+                v-model="maGioiThieuDaiLy"
+                label="Mã giới thiệu cho đại lý và cộng tác viên"
+                :rules="[requiredValidator]"
+              />
+            </VCol>
+            <VCol cols="12" v-else>
               <VTextField
                 v-model="maGioiThieuAdd"
                 label="Mã giới thiệu"
@@ -1129,6 +1201,23 @@ onMounted(() => {
                 item-value="value"
               />
             </VCol>
+            <VRow
+              v-if="selectedQuyen == 2 || selectedQuyen == 3"
+              style="padding: 12px"
+            >
+              <VCol cols="8">
+                <VTextField
+                  v-model="AgencyMGT"
+                  label="Mã giới thiệu cho đại lý và cộng tác viên"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol cols="4">
+                <VBtn color="primary" @click="addMgtDaily">
+                  <VIcon icon="bx-add-to-queue" />
+                </VBtn>
+              </VCol>
+            </VRow>
             <VCol cols="12">
               <VTextField
                 v-model="Edit.maGioiThieuAdd1"

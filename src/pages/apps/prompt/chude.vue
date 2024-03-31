@@ -98,7 +98,7 @@ const fetchBannerPag = async (page) => {
         chuDeList.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
+    
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -120,75 +120,7 @@ watch(currentPage, (newVal, oldVal) => {
   fetchBannerPag(newVal);
 });
 
-// 👉 search filters
-const roles = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Quản trị viên",
-    value: "admin",
-  },
-  {
-    title: "Kiểm duyệt viên",
-    value: "author",
-  },
-  {
-    title: "Cộng tác viên",
-    value: "editor",
-  },
-  {
-    title: "Đại lý",
-    value: "maintainer",
-  },
-  {
-    title: "Subscriber",
-    value: "subscriber",
-  },
-]);
 
-const plans = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Basic",
-    value: "basic",
-  },
-  {
-    title: "Company",
-    value: "company",
-  },
-  {
-    title: "Enterprise",
-    value: "enterprise",
-  },
-  {
-    title: "Team",
-    value: "team",
-  },
-]);
-
-const status = ref([
-  {
-    title: "Tất cả",
-    value: "all",
-  },
-  {
-    title: "Pending",
-    value: "pending",
-  },
-  {
-    title: "Active",
-    value: "active",
-  },
-  {
-    title: "Inactive",
-    value: "inactive",
-  },
-]);
 
 const isAddNewUserDrawerVisible = ref(false);
 
@@ -234,7 +166,6 @@ const handleOk = (e) => {
 };
 const deleteUser = async () => {
   try {
-    console.log("idDelete.value", idDelete.value);
     const deleteUsr = await request.post(`api/deleteChuDe.php`, {
       id: idDelete.value,
     });

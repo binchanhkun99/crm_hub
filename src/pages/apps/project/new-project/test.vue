@@ -27,8 +27,6 @@ watchEffect(() => {
 });
 watch(showForm, (oldVAlue, newvALUE) => {
   saveForm.value = [];
-  console.log("showForm", showForm.value);
-console.log("Chaoooooo", dataSubject.value[showForm.value]);
   for (var temp of dataSubject.value[showForm.value].data) {
     saveForm.value.push({
       id: temp.id,
@@ -44,7 +42,6 @@ const generateObjectId = () => {
   if (userString) {
     const userObject = JSON.parse(userString);
     const payload = userObject.payload;
-    console.log("payload", payload);
     const timestamp = Date.now();
     const object_id = `${payload.user_id}_${timestamp}`;
     return object_id;
@@ -148,9 +145,9 @@ const getSubject = async () => {
     const res = await request.get("http://192.168.1.7:1234/api/v1/promts/list");
     console.log(res.data.data, "sdajdfsjhkjkasd");
     if (res.data.status === true) {
-      console.log("trueueuueueue");
+
       dataSubject.value = res.data.data;
-      console.log("ksjdsjdsfjdfsa____", dataSubject.value);
+
       showForm.value = 0;
     }
   } catch (error) {
@@ -173,7 +170,6 @@ const selectItem = (item, index) => {
 
 //👉 Genarate chat  -->
 const postChat = async () => {
-  console.log(JSON.stringify(saveForm.value), "SaveForm");
   const data = JSON.stringify(saveForm.value);
   await request
     .post("http://192.168.1.7:1234/api/v1/create/story", {

@@ -41,7 +41,6 @@ const errors = ref({
   email: undefined
 });
 const loggedIn = computed(() => store.getters.usersss)
-console.log("____HJJHHJHHJ?______", loggedIn.value)
 if (loggedIn.value) {
   router.push("/");
 }
@@ -68,8 +67,6 @@ const register = () => {
       }, 3000)
     //   const { errors: formErrors } = error.response.data;
 
-
-      console.log("errr");
     });
 };
 const isPasswordVisible = ref(false);

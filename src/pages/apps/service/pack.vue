@@ -96,7 +96,7 @@ const fetchPackagePag = async (page) => {
         dataPack.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-        console.log(" totalPage.value", totalPage.value);
+  
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -331,7 +331,7 @@ const addUser = async () => {
       alert("Please fill in all fields");
       return;
     }
-    console.log("LOGI", Support_ids.value);
+
     const supportIdsString = Support_ids.value.join(",");
     const platformString = Platform.value.join(",");
 
@@ -419,7 +419,7 @@ const showEdit = async (id) => {
         selectItemData.value.push(parseInt(temp));
       }
       prListEditVal.value = sp;
-      console.log(prListEditVal.value);
+  
       Edit.value.title = data.title;
       Edit.value.Description = data.description;
       Edit.value.TimeDate = data.date;
@@ -468,13 +468,7 @@ const SaveEdit = async () => {
       !spidsStringEdit ||
       !plfStringEdit
     ) {
-      console.log("Title:", Edit.value.title);
-      console.log("Description:", Edi.valuet.Description);
-      console.log("TimeDate:", Edit.value.TimeDate);
-      console.log("Expiry_date:", Edit.value.Expiry_date);
-      console.log("Price:", Edit.value.Price);
-      console.log("Support_ids:", spidsStringEdit.value);
-      console.log("Platform:", plfStringEdit.value);
+
       alert("Please fill in all fields");
       return;
     }
