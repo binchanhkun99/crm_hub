@@ -261,7 +261,7 @@ onMounted(() => {
 
       <VCol cols="12">
         
-        <VCard title="Quản lý Banner">
+        <VCard title="Quản lý Hoá đơn - Doanh Thu">
           <VDivider />
 <VRow>
   <VCol cols="4" style="margin-top: 8px; position: relative;
