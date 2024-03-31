@@ -7,9 +7,7 @@ import dfs from "@images/logos/Stable_Diffusion_logo_2b68efd6c7.png";
 
 const selectAI = ref();
 const Resolution = ref();
-const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-const role = ref();
-role.value = dataRole.level;
+
 // watch()
 const apiKey = ref();
 const fetchConfig = async () => {
@@ -57,7 +55,11 @@ const saveConfigImage = async ()=>{
         loading.value = false
     }
 }
+const role = ref(0);
 onMounted(() => {
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+
+role.value = dataRole.level;
   fetchConfig();
 });
 </script>
@@ -73,7 +75,7 @@ onMounted(() => {
     </a-result>
   </section>
 
-  <section>
+  <section v-else>
     <VCol cols="12">
       <VCard title="Edit Config IMAGE">
         <VProgressLinear v-if="loading" indeterminate color="primary" />

@@ -350,7 +350,11 @@ watch(
 watch(currentPageMgt, (newVal, oldVal) => {
   fetchUserbyMgt(newVal)
 });
+const role = ref(0);
+const dataRole = JSON.parse(localStorage.getItem("user")) || {};
 
+  
+role.value = dataRole.level;
 // 👉 OnMounted
 onMounted(() => {
   fetchAgency();
@@ -401,7 +405,7 @@ onMounted(() => {
                 <th scope="col">Email</th>
                 <th scope="col">Mã giới thiệu</th>
                 <th scope="col">Giá</th>
-                <th scope="col">ACTIONS</th>
+                <th scope="col" v-if="role == 0 || role == 1">ACTIONS</th>
               </tr>
             </thead>
 
@@ -457,7 +461,7 @@ onMounted(() => {
                   </div>
                 </td>
                 <!-- 👉 Actions -->
-                <td class="text-center" style="width: 80px">
+                <td class="text-center" style="width: 80px" v-if="role == 0 || role == 1">
                   <VBtn color="warning" style="margin-right: 8px">
                     <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
                   </VBtn>

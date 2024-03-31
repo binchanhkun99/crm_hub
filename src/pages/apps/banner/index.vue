@@ -19,10 +19,6 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
-const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-const role = ref()
-role.value = dataRole.level
-
 
 const pageSize = ref(0);
 
@@ -358,13 +354,16 @@ const SaveEdit = async () => {
   }
 };
 // 👉 OnMounted
+const role = ref(0);
 onMounted(() => {
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+  role.value = dataRole.level;
   fetchBanner();
 });
 </script>
 
 <template>
-    <section v-if="role!=0">
+  <section v-if="role != 0">
     <a-result
       status="500"
       title="401"
@@ -373,15 +372,13 @@ onMounted(() => {
       <template #extra> </template>
     </a-result>
   </section>
-  <section>
+  <section v-else>
     <div>
       <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
         <p>Bạn có chắc muốn xoá Banner này?</p>
       </a-modal>
     </div>
     <VRow>
-   
-
       <VCol cols="12">
         <VCard title="Quản lý Banner">
           <VDivider />

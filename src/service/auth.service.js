@@ -15,13 +15,14 @@ class AuthService {
       const data = response.data;
       console.log(data); // In ra dữ liệu để kiểm tra
   
-      if (data.status === "error" || data.level !== 0) {
-        alert("Bạn không có quyền này!!!");
-        return;
-      } else {
+      if (data.status != "error" || data.level == 0 ||  data.level == 1 ||  data.level == 2 ||  data.level == 3) {
+       
         localStorage.setItem("user", JSON.stringify(response.data));
         setAuth();
         return response.data;
+      } else {
+        alert("Bạn không có quyền này!!!");
+        return;
       }
     } catch (e) {
       console.log(e);

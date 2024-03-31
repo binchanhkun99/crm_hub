@@ -96,7 +96,7 @@ const fetchPackagePag = async (page) => {
         dataPack.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-  
+
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -405,21 +405,20 @@ const showEdit = async (id) => {
     if (res.data.status) {
       const data = res.data.data[0];
       const dl = data.platform.split(",");
-      
+
       let sp;
       sp = [];
-      if (typeof data.support_ids === 'string') {
+      if (typeof data.support_ids === "string") {
         sp = data.support_ids.split(",");
       } else {
         sp = [data.support_ids];
       }
-      selectItemData.value = []
+      selectItemData.value = [];
       for (const temp of sp) {
-       
         selectItemData.value.push(parseInt(temp));
       }
       prListEditVal.value = sp;
-  
+
       Edit.value.title = data.title;
       Edit.value.Description = data.description;
       Edit.value.TimeDate = data.date;
@@ -468,7 +467,6 @@ const SaveEdit = async () => {
       !spidsStringEdit ||
       !plfStringEdit
     ) {
-
       alert("Please fill in all fields");
       return;
     }
@@ -508,14 +506,29 @@ const SaveEdit = async () => {
   }
 };
 // 👉 OnMounted
+const role = ref(0);
 onMounted(async () => {
+  // await beforEdit();
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+
+
+  role.value = dataRole.level;
   // await beforEdit();
   fetchPackage();
 });
 </script>
 
 <template>
-  <section>
+  <section v-if="role != 0">
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
+  </section>
+  <section v-else>
     <div>
       <a-modal v-model:open="open" title="Delete Package" @ok="handleOk">
         <p>Bạn có chắc muốn xoá Package này?</p>

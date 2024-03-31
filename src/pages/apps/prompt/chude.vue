@@ -17,9 +17,7 @@ const loading = ref(false);
 const apiKey = ref();
 const page = ref();
 const show1 = ref(false);
-const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-const role = ref();
-role.value = dataRole.level;
+
 const isDialogVisible = ref(false);
 
 const userListMeta = [
@@ -354,7 +352,11 @@ const SaveEdit = async () => {
   }
 };
 // 👉 OnMounted
+const role = ref(0);
 onMounted(() => {
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+
+role.value = dataRole.level;
   fetchBanner();
 });
 </script>
@@ -369,7 +371,7 @@ onMounted(() => {
       <template #extra> </template>
     </a-result>
   </section>
-  <section>
+  <section v-else>
     {{ chuDeList.value }}
     <div>
       <a-modal v-model:open="open" title="Delete Chủ đề" @ok="handleOk">

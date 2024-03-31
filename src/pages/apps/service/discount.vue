@@ -401,13 +401,27 @@ const SaveEdit = async () => {
   }
 };
 // 👉 OnMounted
+const role = ref(0);
 onMounted(() => {
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+
+
+  role.value = dataRole.level;
   fetchDiscount();
 });
 </script>
 
 <template>
-  <section>
+   <section v-if="role != 0">
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
+  </section>
+  <section v-else>
     <div>
       <a-modal v-model:open="open" title="Delete Discount" @ok="handleOk">
         <p>Bạn có chắc muốn xoá Discount này?</p>

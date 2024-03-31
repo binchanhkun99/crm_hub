@@ -36,12 +36,12 @@ const getTicketAll = async () => {
       loadingData.value = false;
     });
 };
-const open = ref()
-const closeTkID = ref()
-const closeTicket = (id) =>{
-open.value = true
-closeTkID.value = id
-}
+const open = ref();
+const closeTkID = ref();
+const closeTicket = (id) => {
+  open.value = true;
+  closeTkID.value = id;
+};
 const notiSuccess = ref(false);
 const notiError = ref(false);
 const pushNotiSuccess = () => {
@@ -56,13 +56,13 @@ const pushNotiError = () => {
     notiError.value = false;
   }, 2000);
 };
-const handleOk = async ()=>{
+const handleOk = async () => {
   try {
     const deleteUsr = await request.post(
       `api/admin/index.php?key=${apiKey.value}&action=update_status_cskh`,
       {
-        ticket_id:  tkId.value,
-        new_status: 4
+        ticket_id: tkId.value,
+        new_status: 4,
       }
     );
     if (deleteUsr.data.data == 1) {
@@ -78,7 +78,7 @@ const handleOk = async ()=>{
     pushNotiError();
     console.log(error);
   }
-}
+};
 const getAllTicket = async () => {
   loadingData.value = true;
 
@@ -238,7 +238,10 @@ const sendMessageByNhanVien = async () => {
     autoScroll();
   }
 };
+const role = ref(0);
 onMounted(() => {
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+  role.value = dataRole.level;
   getAllTicket();
   // autoScroll()
 });
@@ -266,7 +269,7 @@ const autoScroll = () => {
 };
 </script>
 <template>
-  <section>
+  <section v-if="role == 0 || role == 1">
     <div>
       <a-modal v-model:open="open" title="Đóng Ticket" @ok="handleOk">
         <p>Bạn có chắc đóng Ticket này?</p>
@@ -514,6 +517,15 @@ const autoScroll = () => {
         </VAlert>
       </VCard>
     </VDialog>
+  </section>
+  <section v-else>
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
   </section>
 </template>
 <style lang="scss">

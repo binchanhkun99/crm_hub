@@ -19,9 +19,7 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
-const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-const role = ref();
-role.value = dataRole.level;
+
 const userListMeta = [
   {
     icon: "bx-user",
@@ -119,7 +117,6 @@ watch(currentPage, (newVal, oldVal) => {
   fetchGPTPag(newVal);
 });
 
-
 const isAddNewUserDrawerVisible = ref(false);
 
 // 👉 watching current page
@@ -169,7 +166,7 @@ const deleteUser = async () => {
         id: idDelete.value,
       }
     );
-  
+
     if (deleteUsr.data.data == 1) {
       fetchGPT();
       open.value = false;
@@ -314,14 +311,20 @@ const SaveEdit = async () => {
     isDialogEdit.value = false;
   }
 };
+const role = ref(0);
 // 👉 OnMounted
 onMounted(() => {
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+  role.value = dataRole.level;
+  console.log("role.value ", role.value );
   fetchGPT();
 });
 </script>
 
 <template>
-    <section v-if="role!=0">
+ 
+  <section v-if="role == 0">
+
     <a-result
       status="500"
       title="401"
@@ -330,7 +333,7 @@ onMounted(() => {
       <template #extra> </template>
     </a-result>
   </section>
-  <section>
+  <section v-else>
     <div>
       <a-modal v-model:open="open" title="Delete Key GPT" @ok="handleOk">
         <p>Bạn có chắc muốn xoá Key này?</p>

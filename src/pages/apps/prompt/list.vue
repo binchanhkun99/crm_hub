@@ -21,11 +21,6 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
-const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-
-const role = ref();
-role.value = dataRole.level;
-
 
 const userListMeta = [
   {
@@ -478,7 +473,7 @@ const removeSelectEdit = (item) => {
 };
 const addInputEdit = () => {
   if (Edit.value.inputType == "text") {
-     Edit.value.input.push({
+    Edit.value.input.push({
       inputName: "",
       placeholder: "",
     });
@@ -516,9 +511,9 @@ const showEdit = async (id) => {
       Edit.value.trangThai = data.trangThai;
       // Edit.value.input = dl;
       const DI = JSON.parse(data.input);
-   
+
       Edit.value.input = DI;
-    
+
       // if (data.inputType == "select") {
       //   DI.map((item) => {
       //     dynamicSelectEdit.select.push({
@@ -580,7 +575,7 @@ const SaveEdit = async () => {
       return;
     }
     loadingAddUser.value = true;
-    const inputToSaveEdit =Edit.value.input
+    const inputToSaveEdit = Edit.value.input;
     loadingAddUser.value = true;
     const res = await request.post(
       `api/editPromt.php?key=${apiKey.value}`,
@@ -620,15 +615,20 @@ const SaveEdit = async () => {
     isDialogEdit.value = false;
   }
 };
+const role = ref(0);
 // 👉 OnMounted
 onMounted(async () => {
   // await beforEdit();
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+
+  
+  role.value = dataRole.level;
   fetchPackage();
 });
 </script>
 
 <template>
-    <section v-if="role!=0">
+  <section v-if="role != 0">
     <a-result
       status="500"
       title="401"
@@ -637,7 +637,7 @@ onMounted(async () => {
       <template #extra> </template>
     </a-result>
   </section>
-  <section>
+  <section v-else>
     <div>
       <a-modal v-model:open="open" title="Delete Prompt" @ok="handleOk">
         <p>Bạn có chắc muốn xoá Prompt này?</p>
@@ -1149,22 +1149,22 @@ onMounted(async () => {
                   style="display: flex; margin-bottom: 8px"
                   align="baseline"
                 >
-                  <div v-if="user.placeholder!=null" style="display: flex;">
+                  <div v-if="user.placeholder != null" style="display: flex">
                     <a-input
-                    style="height: 60px; margin-right: 8px"
+                      style="height: 60px; margin-right: 8px"
                       v-model:value="user.inputName"
                       placeholder="Input"
                     />
 
-                    <a-input 
-                    
-                    style="height: 60px; margin-right: 8px"
+                    <a-input
+                      style="height: 60px; margin-right: 8px"
                       v-model:value="user.placeholder"
                       placeholder="Value"
                     />
                   </div>
-                  <div v-if="user.options!=null" style="display: flex;">
-                    <a-input style="height: 60px; margin-right: 8px"
+                  <div v-if="user.options != null" style="display: flex">
+                    <a-input
+                      style="height: 60px; margin-right: 8px"
                       v-model:value="user.inputName"
                       placeholder="Input"
                     />

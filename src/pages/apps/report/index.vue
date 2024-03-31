@@ -21,9 +21,6 @@ const page = ref();
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
-const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-const role = ref();
-role.value = dataRole.level;
 
 const pageSize = ref(0);
 
@@ -190,18 +187,23 @@ const pushNotiError = () => {
 };
 
 const exportTable = ref();
-const stDate = ref()
-const endDate = ref()
+const stDate = ref();
+const endDate = ref();
 const ExportExcel = async () => {
-  if(!stDate.value || !endDate.value){
-    alert("Thời gian không được để trống!")
+  if (!stDate.value || !endDate.value) {
+    alert("Thời gian không được để trống!");
     return;
   }
-  console.log('stDate', stDate.value);
+  console.log("stDate", stDate.value);
   try {
-    const res = request.posst(`https://api-test.aidu.com.vn/api/admin/index.php?key=hrlvsfk8reh220jt30ui0muevl&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`)
-    if(res.data.status){
-      window.open("https://api-test.aidu.com.vn/api/admin/baocaodulieu.xlsx", "_blank");
+    const res = request.posst(
+      `https://api-test.aidu.com.vn/api/admin/index.php?key=hrlvsfk8reh220jt30ui0muevl&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`
+    );
+    if (res.data.status) {
+      window.open(
+        "https://api-test.aidu.com.vn/api/admin/baocaodulieu.xlsx",
+        "_blank"
+      );
     }
   } catch (error) {
     console.log(error);
@@ -218,14 +220,16 @@ const ExportExcel = async () => {
   //   const exportType = exportFromJSON.types.csv;
   //   if (data) exportFromJSON({ data, fileName, exportType });
   const deleteUsr = await request.get(
-    `api/admin/index.php?key=${apiKey.value}&action=export_excel`,
-   
+    `api/admin/index.php?key=${apiKey.value}&action=export_excel`
   );
 };
-
+const role = ref(0);
 // 👉 OnMounted
 onMounted(() => {
   try {
+    const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+    
+    role.value = dataRole.level;
     fetchInvoice();
   } catch (error) {
     console.log(error);
@@ -234,18 +238,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <section v-if="role!=0">
-    <a-result
-      status="500"
-      title="401"
-      sub-title="Bạn không có quyền truy cập trang này!"
-    >
-      <template #extra> </template>
-    </a-result>
-  </section>
-
-  <section v-else>
-    <!-- <table ref="exportTable">
+  <section>
+    <div v-if="role != 0">
+      <a-result
+        status="500"
+        title="401"
+        sub-title="Bạn không có quyền truy cập trang này!"
+      >
+        <template #extra> </template>
+      </a-result>
+    </div>
+    <div v-else>
+      <!-- <table ref="exportTable">
       <tbody>
         <tr>
           <td>h1</td>
@@ -254,57 +258,57 @@ onMounted(() => {
         </tr>
       </tbody>
     </table> -->
-    <div>
-      <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
-        <p>Bạn có chắc muốn xoá Banner này?</p>
-      </a-modal>
-    </div>
-    <VRow>
-      <ThongKe />
+      <div>
+        <a-modal v-model:open="open" title="Delete Banner" @ok="handleOk">
+          <p>Bạn có chắc muốn xoá Banner này?</p>
+        </a-modal>
+      </div>
+      <VRow>
+        <ThongKe />
 
-      <VCol cols="12">
-        
-        <VCard title="Quản lý Hoá đơn - Doanh Thu">
-          <VDivider />
-<VRow>
-  <VCol cols="4" style="margin-top: 8px; position: relative;
-    left: 10px;">
-              <AppDateTimePicker
-                v-model="stDate"
-                label="Thời gian bắt đầu"
-                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
-            /></VCol>
-            <VCol cols="4" style="margin-top: 8px;">
-              <AppDateTimePicker
-                v-model="endDate"
-                label="Thời gian kết thúc"
-                :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
-            /></VCol>
-            <VCol cols="4">
-            <VCardText class="d-flex flex-wrap gap-4">
-            <!-- 👉 Export button -->
-            
-            <VSpacer />
+        <VCol cols="12">
+          <VCard title="Quản lý Hoá đơn - Doanh Thu">
+            <VDivider />
+            <VRow>
+              <VCol
+                cols="4"
+                style="margin-top: 8px; position: relative; left: 10px"
+              >
+                <AppDateTimePicker
+                  v-model="stDate"
+                  label="Thời gian bắt đầu"
+                  :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+              /></VCol>
+              <VCol cols="4" style="margin-top: 8px">
+                <AppDateTimePicker
+                  v-model="endDate"
+                  label="Thời gian kết thúc"
+                  :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+              /></VCol>
+              <VCol cols="4">
+                <VCardText class="d-flex flex-wrap gap-4">
+                  <!-- 👉 Export button -->
 
-            <div class="d-flex align-center">
-              <!-- 👉 Export -->
-              <VBtn color="primary" @click="ExportExcel">
-                <VIcon start icon="bx-cloud-upload" />
-                Export
-              </VBtn>
-            </div>
-          </VCardText>
-        </VCol>
-</Vrow>
-          
+                  <VSpacer />
 
-          <VDivider />
-          <VProgressLinear v-if="loading" indeterminate color="primary" />
-          <VTable class="text-no-wrap">
-            <!-- 👉 table head -->
-            <thead>
-              <tr>
-                <!-- <th scope="col" style="width: 48px">
+                  <div class="d-flex align-center">
+                    <!-- 👉 Export -->
+                    <VBtn color="primary" @click="ExportExcel">
+                      <VIcon start icon="bx-cloud-upload" />
+                      Export
+                    </VBtn>
+                  </div>
+                </VCardText>
+              </VCol>
+            </VRow>
+
+            <VDivider />
+            <VProgressLinear v-if="loading" indeterminate color="primary" />
+            <VTable class="text-no-wrap">
+              <!-- 👉 table head -->
+              <thead>
+                <tr>
+                  <!-- <th scope="col" style="width: 48px">
                   <VCheckbox
                     :model-value="selectAllUser"
                     :indeterminate="
@@ -315,21 +319,21 @@ onMounted(() => {
                     @click="selectUnselectAll"
                   />
                 </th> -->
-                <th scope="col">STT</th>
-                <th scope="col">Người dùng</th>
-                <th scope="col">Email</th>
-                <th scope="col">Gói đã mua</th>
-                <th scope="col">Giá</th>
-                <th scope="col">Ngày mua</th>
-                <!-- <th scope="col">ACTIONS</th> -->
-              </tr>
-            </thead>
+                  <th scope="col">STT</th>
+                  <th scope="col">Người dùng</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Gói đã mua</th>
+                  <th scope="col">Giá</th>
+                  <th scope="col">Ngày mua</th>
+                  <!-- <th scope="col">ACTIONS</th> -->
+                </tr>
+              </thead>
 
-            <!-- 👉 table body -->
-            <tbody>
-              <tr v-for="(user, index) in invoiceData" :key="index">
-                <!-- 👉 Checkbox -->
-                <!-- <td>
+              <!-- 👉 table body -->
+              <tbody>
+                <tr v-for="(user, index) in invoiceData" :key="index">
+                  <!-- 👉 Checkbox -->
+                  <!-- <td>
                   <VCheckbox
                     :id="`check${user.id}`"
                     :model-value="selectedRows.includes(`check${user.id}`)"
@@ -338,15 +342,15 @@ onMounted(() => {
                   />
                 </td> -->
 
-                <!-- 👉 User -->
-                <td>
-                  <div class="d-flex align-center">
-                    {{ index + 1 }}
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex align-center">
-                    <!-- <VAvatar
+                  <!-- 👉 User -->
+                  <td>
+                    <div class="d-flex align-center">
+                      {{ index + 1 }}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-center">
+                      <!-- <VAvatar
                       variant="tonal"
                       :color="resolveUserRoleVariant(user.role).color"
                       class="me-3"
@@ -358,221 +362,228 @@ onMounted(() => {
                       }}</span>
                     </VAvatar> -->
 
-                    <div class="d-flex flex-column">
-                      <h6 class="text-sm">
-                        <!-- <RouterLink
+                      <div class="d-flex flex-column">
+                        <h6 class="text-sm">
+                          <!-- <RouterLink
                           :to="{
                             name: 'apps-user-view-id',
                             params: { id: user.id },
                           }"
                           class="font-weight-medium user-list-name"
                         > -->
-                        {{ user.user }}
-                        <!-- </RouterLink> -->
-                      </h6>
+                          {{ user.user }}
+                          <!-- </RouterLink> -->
+                        </h6>
+                      </div>
                     </div>
-                  </div>
-                </td>
+                  </td>
 
-                <!-- 👉 URL banner -->
-                <td>
-                  <span class="text-capitalize text-base">{{ user.mail }}</span>
-                </td>
+                  <!-- 👉 URL banner -->
+                  <td>
+                    <span class="text-capitalize text-base">{{
+                      user.mail
+                    }}</span>
+                  </td>
 
-                <!-- 👉 Description -->
-                <td>
-                  <span class="text-base text-high-emphasis">{{
-                    user.title_pack
-                  }}</span>
-                </td>
-                <td>
-                  <span class="text-base text-high-emphasis">{{
-                    user.money
-                  }}</span>
-                </td>
-                <td>
-                  <span class="text-base text-high-emphasis">{{
-                    user.createAt
-                  }}</span>
-                </td>
-                <!-- 👉 Actions -->
-              </tr>
-            </tbody>
+                  <!-- 👉 Description -->
+                  <td>
+                    <span class="text-base text-high-emphasis">{{
+                      user.title_pack
+                    }}</span>
+                  </td>
+                  <td>
+                    <span class="text-base text-high-emphasis">{{
+                      user.money
+                    }}</span>
+                  </td>
+                  <td>
+                    <span class="text-base text-high-emphasis">{{
+                      user.createAt
+                    }}</span>
+                  </td>
+                  <!-- 👉 Actions -->
+                </tr>
+              </tbody>
 
-            <!-- 👉 table footer  -->
-            <tfoot v-show="!invoiceData.length">
-              <tr>
-                <td colspan="7" class="text-center text-body-1">
-                  No data available
-                </td>
-              </tr>
-            </tfoot>
-          </VTable>
-          <VDivider />
+              <!-- 👉 table footer  -->
+              <tfoot v-show="!invoiceData.length">
+                <tr>
+                  <td colspan="7" class="text-center text-body-1">
+                    No data available
+                  </td>
+                </tr>
+              </tfoot>
+            </VTable>
+            <VDivider />
 
-          <!-- SECTION Pagination -->
-          <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
-            <!-- 👉 Rows per page -->
-            <div class="d-flex align-center" style="width: 171px">
-              <span class="text-no-wrap text-sm me-3">Rows per page:</span>
-              <VSelect
-                v-model="rowPerPage"
-                density="compact"
-                class="per-page-select"
-                variant="plain"
-                :items="[10, 20, 30, 50]"
+            <!-- SECTION Pagination -->
+            <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
+              <!-- 👉 Rows per page -->
+              <div class="d-flex align-center" style="width: 171px">
+                <span class="text-no-wrap text-sm me-3">Rows per page:</span>
+                <VSelect
+                  v-model="rowPerPage"
+                  density="compact"
+                  class="per-page-select"
+                  variant="plain"
+                  :items="[10, 20, 30, 50]"
+                />
+              </div>
+
+              <!-- 👉 Pagination and pagination meta -->
+              <div class="d-flex align-center">
+                <h6 class="text-sm font-weight-regular">
+                  {{ paginationData }}
+                </h6>
+              </div>
+              <VPagination
+                v-model="currentPage"
+                size="small"
+                :total-visible="1"
+                :length="pageSize"
+                @next="selectedRows = []"
+                @prev="selectedRows = []"
               />
-            </div>
+            </VCardText>
+            <!-- !SECTION -->
+          </VCard>
+        </VCol>
+      </VRow>
 
-            <!-- 👉 Pagination and pagination meta -->
-            <div class="d-flex align-center">
-              <h6 class="text-sm font-weight-regular">
-                {{ paginationData }}
-              </h6>
-            </div>
-            <VPagination
-              v-model="currentPage"
-              size="small"
-              :total-visible="1"
-              :length="pageSize"
-              @next="selectedRows = []"
-              @prev="selectedRows = []"
-            />
-          </VCardText>
-          <!-- !SECTION -->
-        </VCard>
-      </VCol>
-    </VRow>
-
-    <!-- 👉 Add New User -->
-    <VDialog v-model="isDialogVisible" max-width="600">
-      <!-- Dialog Content -->
-      <VCard title="Add New GPT">
-        <DialogCloseBtn
-          variant="text"
-          size="small"
-          @click="isDialogVisible = false"
-        />
-
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <VTextField
-                v-model="title"
-                label="Title"
-                :rules="[requiredValidator]"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextField
-                v-model="Url"
-                :rules="[requiredValidator]"
-                label="URL"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextField
-                v-model="Des"
-                :rules="[requiredValidator]"
-                label="Description"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-        <VCardText class="d-flex justify-end gap-2">
-          <VBtn
-            color="secondary"
-            variant="tonal"
+      <!-- 👉 Add New User -->
+      <VDialog v-model="isDialogVisible" max-width="600">
+        <!-- Dialog Content -->
+        <VCard title="Add New GPT">
+          <DialogCloseBtn
+            variant="text"
+            size="small"
             @click="isDialogVisible = false"
-          >
-            Close
-          </VBtn>
-          <VBtn @click="addUser"> Save </VBtn>
-        </VCardText>
-      </VCard>
-    </VDialog>
+          />
 
-    <!-- Dialog loading -->
-    <VDialog v-model="loadingAddUser" width="300">
-      <VCard color="primary" width="300">
-        <VCardText class="pt-3">
-          Waiting for me.....
-          <VProgressLinear indeterminate class="mb-0" />
-        </VCardText>
-      </VCard>
-    </VDialog>
+          <VCardText>
+            <VRow>
+              <VCol cols="12">
+                <VTextField
+                  v-model="title"
+                  label="Title"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol cols="12">
+                <VTextField
+                  v-model="Url"
+                  :rules="[requiredValidator]"
+                  label="URL"
+                />
+              </VCol>
+              <VCol cols="12">
+                <VTextField
+                  v-model="Des"
+                  :rules="[requiredValidator]"
+                  label="Description"
+                />
+              </VCol>
+            </VRow>
+          </VCardText>
+          <VCardText class="d-flex justify-end gap-2">
+            <VBtn
+              color="secondary"
+              variant="tonal"
+              @click="isDialogVisible = false"
+            >
+              Close
+            </VBtn>
+            <VBtn @click="addUser"> Save </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
 
-    <!-- Dialog loading data edit-->
-    <VDialog v-model="loadingEdit" width="300">
-      <VCard color="primary" width="300">
-        <VCardText class="pt-3">
-          Waiting for loading data banner.....
-          <VProgressLinear indeterminate class="mb-0" />
-        </VCardText>
-      </VCard>
-    </VDialog>
+      <!-- Dialog loading -->
+      <VDialog v-model="loadingAddUser" width="300">
+        <VCard color="primary" width="300">
+          <VCardText class="pt-3">
+            Waiting for me.....
+            <VProgressLinear indeterminate class="mb-0" />
+          </VCardText>
+        </VCard>
+      </VDialog>
 
-    <!-- Success-->
-    <VDialog v-model="notiSuccess" width="300">
-      <VCard color="primary" width="300">
-        <VAlert type="success">
-          <strong>Thành công</strong>
-        </VAlert>
-      </VCard>
-    </VDialog>
+      <!-- Dialog loading data edit-->
+      <VDialog v-model="loadingEdit" width="300">
+        <VCard color="primary" width="300">
+          <VCardText class="pt-3">
+            Waiting for loading data banner.....
+            <VProgressLinear indeterminate class="mb-0" />
+          </VCardText>
+        </VCard>
+      </VDialog>
 
-    <!-- Error-->
-    <VDialog v-model="notiError" width="300">
-      <VCard color="primary" width="300">
-        <VAlert type="error">
-          <strong>Đã có lỗi xẩy ra vui lòng thử lại sau</strong>
-        </VAlert>
-      </VCard>
-    </VDialog>
+      <!-- Success-->
+      <VDialog v-model="notiSuccess" width="300">
+        <VCard color="primary" width="300">
+          <VAlert type="success">
+            <strong>Thành công</strong>
+          </VAlert>
+        </VCard>
+      </VDialog>
 
-    <!-- 👉 Edit New User -->
-    <VDialog persistent v-model="isDialogEdit" max-width="600">
-      <!-- Edit Dialog -->
-      <VCard title="Edit GPT Key">
-        <DialogCloseBtn
-          variant="text"
-          size="small"
-          @click="isDialogEdit = false"
-        />
+      <!-- Error-->
+      <VDialog v-model="notiError" width="300">
+        <VCard color="primary" width="300">
+          <VAlert type="error">
+            <strong>Đã có lỗi xẩy ra vui lòng thử lại sau</strong>
+          </VAlert>
+        </VCard>
+      </VDialog>
 
-        <VCardText>
-          <VRow>
-            <!-- <VCol cols="12">
+      <!-- 👉 Edit New User -->
+      <VDialog persistent v-model="isDialogEdit" max-width="600">
+        <!-- Edit Dialog -->
+        <VCard title="Edit GPT Key">
+          <DialogCloseBtn
+            variant="text"
+            size="small"
+            @click="isDialogEdit = false"
+          />
+
+          <VCardText>
+            <VRow>
+              <!-- <VCol cols="12">
               <VTextField
                 v-model="Edit.title"
                 :rules="[requiredValidator]"
                 label="Title"
               />
             </VCol> -->
-            <VCol cols="12">
-              <VTextField
-                v-model="Edit.Url"
-                :rules="[requiredValidator]"
-                label="Key"
-              />
-            </VCol>
-            <VCol cols="12">
-              <VTextField
-                v-model="Edit.Des"
-                :rules="[requiredValidator]"
-                label="Description"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-        <VCardText class="d-flex justify-end gap-2">
-          <VBtn color="secondary" variant="tonal" @click="isDialogEdit = false">
-            Close
-          </VBtn>
-          <VBtn @click="SaveEdit"> Save </VBtn>
-        </VCardText>
-      </VCard>
-    </VDialog>
+              <VCol cols="12">
+                <VTextField
+                  v-model="Edit.Url"
+                  :rules="[requiredValidator]"
+                  label="Key"
+                />
+              </VCol>
+              <VCol cols="12">
+                <VTextField
+                  v-model="Edit.Des"
+                  :rules="[requiredValidator]"
+                  label="Description"
+                />
+              </VCol>
+            </VRow>
+          </VCardText>
+          <VCardText class="d-flex justify-end gap-2">
+            <VBtn
+              color="secondary"
+              variant="tonal"
+              @click="isDialogEdit = false"
+            >
+              Close
+            </VBtn>
+            <VBtn @click="SaveEdit"> Save </VBtn>
+          </VCardText>
+        </VCard>
+      </VDialog>
+    </div>
   </section>
 </template>
 

@@ -157,11 +157,8 @@ const status = ref([
 
 const isAddNewUserDrawerVisible = ref(false);
 
-
-
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-
   const firstIndex = users.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
@@ -618,13 +615,25 @@ const DeletePack = async () => {
     });
 };
 // 👉 OnMounted
+const role = ref(0);
 onMounted(() => {
+  const dataRole = JSON.parse(localStorage.getItem("user")) || {};
+  role.value = dataRole.level;  
   fetchUsers();
 });
 </script>
 
 <template>
-  <section>
+  <section v-if="role != 0 && role != 1">
+    <a-result
+      status="500"
+      title="401"
+      sub-title="Bạn không có quyền truy cập trang này!"
+    >
+      <template #extra> </template>
+    </a-result>
+  </section>
+  <section v-else>
     <div>
       <a-modal v-model:open="open" title="Delete User" @ok="handleOk">
         <p>Bạn có chắc muốn xoá User này?</p>
@@ -732,7 +741,7 @@ onMounted(() => {
                 <th scope="col">Ngày Hết Hạn</th>
                 <th scope="col">Gói Đăng Ký</th>
                 <th scope="col">Mã Giới Thiệu</th>
-                <th scope="col">ACTIONS</th>
+                <th scope="col" v-if="role == 0">ACTIONS</th>
               </tr>
             </thead>
 
@@ -858,7 +867,7 @@ onMounted(() => {
                 </td>
 
                 <!-- 👉 Actions -->
-                <td class="text-center" style="width: 80px">
+                <td v-if="role == 0" class="text-center" style="width: 80px">
                   <VBtn
                     @click="showEdit(user.id)"
                     color="warning"
