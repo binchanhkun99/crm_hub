@@ -323,7 +323,7 @@ onMounted(() => {
 
 <template>
  
-  <section v-if="role == 0">
+  <section v-if="role != 0">
 
     <a-result
       status="500"

@@ -16,7 +16,7 @@
         target="_blank"
         rel="noopener noreferrer"
         class="text-primary ms-1"
-      >Duy Vy - BCK</a>
+      >AiDu</a>
     </span>
     <!-- 👉 Footer: right content -->
   
