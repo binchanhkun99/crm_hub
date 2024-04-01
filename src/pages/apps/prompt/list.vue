@@ -731,7 +731,7 @@ onMounted(async () => {
                 </th> -->
                 <th scope="col">STT</th>
                 <th scope="col">Prompt Name</th>
-                <th scope="col">Moo tả</th>
+                <th scope="col">Mô tả</th>
                 <th scope="col">Chat</th>
                 <th scope="col">Chủ đề</th>
                 <th scope="col">Chủ đề con</th>
@@ -773,14 +773,14 @@ onMounted(async () => {
 
                 <!-- 👉 Mô tả Prompt -->
                 <td>
-                  <VTextField
+                  <VTextarea 
                     style="width: 180px"
                     v-model="user.moTa"
                     label=""
                   />
                 </td>
                 <td>
-                  <VTextField
+                  <VTextarea 
                     style="width: 180px"
                     v-model="user.chat"
                     label=""
@@ -816,8 +816,8 @@ onMounted(async () => {
 
                 <!-- 👉 Actions -->
                 <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
-                    <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
+                  <VBtn  @click="showEdit(user.id)" color="warning" style="margin-right: 8px">
+                    <VIcon icon="bxs-edit" />
                   </VBtn>
                   <VBtn color="error" @click="showModal(user.id)">
                     <VIcon icon="bx-trash" />
@@ -911,9 +911,9 @@ onMounted(async () => {
                 :rules="[requiredValidator]"
             /></VCol>
             <VCol cols="12">
-              <VTextField
+              <VTextarea 
                 v-model="_PromtText"
-                label="Prompt Text"
+                label="Thêm Prompt"
                 :rules="[requiredValidator]"
             /></VCol>
             <VCol cols="12">
@@ -1099,9 +1099,9 @@ onMounted(async () => {
                 :rules="[requiredValidator]"
             /></VCol>
             <VCol cols="12">
-              <VTextField
+              <VTextarea 
                 v-model="Edit.PromtText"
-                label="Prompt Text"
+                label="Sửa Prompt"
                 :rules="[requiredValidator]"
             /></VCol>
             <VCol cols="12">

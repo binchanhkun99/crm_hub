@@ -687,9 +687,9 @@ onMounted(async () => {
                   }}</span>
                 </td>
                 <td>
-                  <VCol cols="12">
-                    <VTextField v-model="user.platform" label="Platform" />
-                  </VCol>
+                  
+                    <VTextField style="width: 130px;" v-model="user.platform" label="Platform" />
+                
                 </td>
 
                 <!-- 👉 Actions -->
