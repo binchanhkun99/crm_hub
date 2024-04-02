@@ -4,7 +4,7 @@ export default [
     title: 'Người dùng',
     icon: { icon: 'bx-user' },
     children: [
-      { title: 'List', to: 'apps-user-list' },
+      { title: 'Danh sách', to: 'apps-user-list' },
       // { title: 'View', to: { name: 'apps-user-view-id', params: { id: 21 } } },
     ],
   },
@@ -29,14 +29,14 @@ export default [
     icon: { icon: 'bxs-package' },
     children: [
       { title: 'Gói cước', to: 'apps-service-pack' },
-      { title: 'Discount', to: 'apps-service-discount' },
+      { title: 'Mã khuyến mại', to: 'apps-service-discount' },
     ],
   },
   {
     title: 'Prompt',
     icon: { icon: 'bxs-component' },
     children: [
-      { title: 'List', to: 'apps-prompt-list' },
+      { title: 'Danh sách', to: 'apps-prompt-list' },
       { title: 'Chủ Đề', to: 'apps-prompt-chude' },
     ],
   },
@@ -49,12 +49,12 @@ export default [
 
     ],
   },
-  { heading: 'Other' },
+  { heading: 'Khác' },
   {
     title: 'Doanh thu',
     icon: { icon: 'bxs-report' },
     children: [
-      { title: 'list', to: 'apps-report' },
+      { title: 'Danh sách', to: 'apps-report' },
 
     ],
   },
