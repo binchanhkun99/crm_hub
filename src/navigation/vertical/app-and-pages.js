@@ -62,7 +62,7 @@ export default [
     title: 'Đại lý',
     icon: { icon: 'bxs-store' },
     children: [
-      { title: 'list', to: 'apps-agency' },
+      { title: 'Danh sách', to: 'apps-agency' },
 
     ],
   },
