@@ -1,13 +1,10 @@
 <script setup>
-import { useTheme } from 'vuetify'
 import navItems from '@/navigation/vertical'
 import { useThemeConfig } from '@core/composable/useThemeConfig'
+import { useTheme } from 'vuetify'
 
 // Components
 import Footer from '@/layouts/components/Footer.vue'
-import NavBarI18n from '@/layouts/components/NavBarI18n.vue'
-import NavBarNotifications from '@/layouts/components/NavBarNotifications.vue'
-import NavbarShortcuts from '@/layouts/components/NavbarShortcuts.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import NavSearchBar from '@/layouts/components/NavSearchBar.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
@@ -47,10 +44,10 @@ const globalThemeBackground = computed(() => global.current.value.colors.backgro
 
         <VSpacer />
 
-        <NavBarI18n />
+        <!-- <NavBarI18n /> -->
         <NavbarThemeSwitcher />
-        <NavbarShortcuts />
-        <NavBarNotifications class="me-2" />
+        <!-- <NavbarShortcuts /> -->
+        <!-- <NavBarNotifications class="me-2" /> -->
         <UserProfile />
       </div>
     </template>
