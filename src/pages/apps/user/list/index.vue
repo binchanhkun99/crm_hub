@@ -6,7 +6,7 @@ import { emailValidator, requiredValidator } from "@validators";
 import { onMounted, watch } from "vue";
 const userListStore = useUserListStore();
 const searchQuery = ref("");
-const selectedRole = ref();
+const selectedRole = ref('');
 const selectedPlan = ref();
 const selectedStatus = ref();
 const rowPerPage = ref(10);
@@ -31,12 +31,11 @@ const fetchUsers = async () => {
   apiKey.value = data.key;
   await request
     .get(
-      `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}`
+      `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}`
     )
     .then((rss) => {
       if (rss.data.success) {
         users.value = rss.data.data;
-
         totalPage.value = rss.data.count;
         console.log(" totalPage.value", totalPage.value);
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
@@ -48,7 +47,7 @@ const fetchUsers = async () => {
       loading.value = false;
       // console.log(error);
     });
-  selectedRole.value = "all";
+  selectedRole.value = "";
   selectedPlan.value = "all";
 };
 // 👉 Fetching users
@@ -84,32 +83,32 @@ watchEffect(() => {
 watch(currentPage, (newVal, oldVal) => {
   fetchUsersPag(newVal);
 });
-
+const searchRoles = ref('')
 // 👉 search filters
 const roles = ref([
   {
     title: "Tất cả",
-    value: "all",
+    value: '',
   },
   {
-    title: "Quản trị viên",
-    value: "admin",
+    title: "Admin",
+    value: 0,
   },
   {
-    title: "Kiểm duyệt viên",
-    value: "author",
-  },
-  {
-    title: "Cộng tác viên",
-    value: "editor",
+    title: "Nhân viên",
+    value: 1,
   },
   {
     title: "Đại lý",
-    value: "maintainer",
+    value: 2,
   },
   {
-    title: "Subscriber",
-    value: "subscriber",
+    title: "Cộng tác viên",
+    value: 3,
+  },
+  {
+    title: "Người dùng",
+    value: 4,
   },
 ]);
 
@@ -653,7 +652,7 @@ onMounted(() => {
       <VCol cols="12">
         <VCard title="Lọc người dùng">
           <VCardText>
-            <VRow>
+            <VRow style="justify-content:flex-start">
               <!-- 👉 Select Role -->
 
               <VCol cols="12" sm="3">
@@ -665,27 +664,7 @@ onMounted(() => {
                   clear-icon="bx-x"
                 />
               </VCol>
-              <!-- 👉 Select Plan -->
-              <VCol cols="12" sm="3">
-                <VSelect
-                  v-model="selectedPlan"
-                  label="Gói cước"
-                  :items="plans"
-                  clearable
-                  clear-icon="bx-x"
-                />
-              </VCol>
-
-              <!-- 👉 Select Status -->
-              <VCol cols="12" sm="3">
-                <VSelect
-                  v-model="selectedStatus"
-                  label="Select Status"
-                  :items="status"
-                  clearable
-                  clear-icon="bx-x"
-                />
-              </VCol>
+             
               <!-- 👉 Search  -->
               <VCol cols="12" sm="2">
                 <VTextField
