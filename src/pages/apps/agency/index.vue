@@ -34,7 +34,7 @@ const pageSizeMgt = ref()
 
 page.value = currentPage.value;
 // 👉 Fetching chuDeList
-
+// const reduce = ref()
 const ListChuDe = ref([]);
 const dataAgency = ref();
 const fetchAgency = async () => {

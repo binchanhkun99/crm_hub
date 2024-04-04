@@ -296,6 +296,8 @@ function resetEditValues() {
   Edit.value.goiDangKy1 = "";
   selectedQuyen.value = "";
 }
+const reduce = ref()
+
 const idUserEdit = ref();
 const selectedQuyen = ref();
 const addMgtDaily = async () => {
@@ -307,6 +309,7 @@ const addMgtDaily = async () => {
         id_user: idUserEdit.value,
         maGioiThieu: AgencyMGT.value,
         role: selectedQuyen == 2 ? 0 : 1,
+        reduce: reduce.value
       }
     );
     if (res.data.status) {
@@ -1084,6 +1087,13 @@ onMounted(() => {
                 :rules="[requiredValidator]"
               />
             </VCol>
+            <VCol cols="12" v-if="quyenUser == 2 || quyenUser == 3">
+              <VTextField
+                v-model="reduce"
+                label="Giá tiền"
+                :rules="[requiredValidator]"
+              />
+            </VCol>
             <VCol cols="12" v-else>
               <VTextField
                 v-model="maGioiThieuAdd"
@@ -1210,18 +1220,26 @@ onMounted(() => {
                 item-value="value"
               />
             </VCol>
+        
             <VRow
               v-if="selectedQuyen == 2 || selectedQuyen == 3"
               style="padding: 12px"
             >
-              <VCol cols="8">
+              <VCol cols="5">
                 <VTextField
                   v-model="AgencyMGT"
                   label="Mã giới thiệu cho đại lý và cộng tác viên"
                   :rules="[requiredValidator]"
                 />
               </VCol>
-              <VCol cols="4">
+              <VCol cols="5">
+                <VTextField
+                  v-model="reduce"
+                  label="Giá tiền"
+                  :rules="[requiredValidator]"
+                />
+              </VCol>
+              <VCol cols="2">
                 <VBtn color="primary" @click="addMgtDaily">
                   <VIcon icon="bx-add-to-queue" />
                 </VBtn>
