@@ -722,6 +722,7 @@ onMounted(() => {
                 <th scope="col">Ngày Đăng Ký</th>
                 <th scope="col">Ngày Hết Hạn</th>
                 <th scope="col">Gói Đăng Ký</th>
+                <th scope="col">Quyền</th>
                 <th scope="col">Mã Giới Thiệu</th>
                 <th scope="col" v-if="role == 0">ACTIONS</th>
               </tr>
@@ -842,6 +843,16 @@ onMounted(() => {
                     </template>
                   </a-dropdown>
                 </td>
+                <td>
+    <span class="text-base text-high-emphasis">{{
+        user.level === 0 ? 'Admin' :
+        user.level === 1 ? 'Nhân viên' :
+        user.level === 2 ? 'Đại lý' :
+        user.level === 3 ? 'CTV' :
+        user.level === 4 ? 'Người dùng' : 'Unknown'
+    }}</span>
+</td>
+              
                 <td>
                   <span class="text-base text-high-emphasis">{{
                     user.maGioiThieu
