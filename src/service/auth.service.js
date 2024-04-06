@@ -13,14 +13,14 @@ class AuthService {
       const response = await request.post(API_URL_LOGIN, dataForm);
   
       const data = response.data;
-      console.log(data); // In ra dữ liệu để kiểm tra
+      console.log("Đmmm data = mấy",data.level); // In ra dữ liệu để kiểm tra
   
-      if (data.status != "error" || data.level == 0 ||  data.level == 1 ||  data.level == 2 ||  data.level == 3) {
+      if ( data.level == 0 ||  data.level == 1 ||  data.level == 2 ||  data.level == 3) {
        
         localStorage.setItem("user", JSON.stringify(response.data));
         setAuth();
         return response.data;
-      } else {
+      } if(data.level ==4 || data.status != "error" ) {
         alert("Bạn không có quyền này!!!");
         return;
       }

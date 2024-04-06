@@ -5,7 +5,7 @@ import { useAppAbility } from '@/plugins/casl/useAppAbility'
 const router = useRouter()
 const ability = useAppAbility()
 const userData = JSON.parse(localStorage.getItem('userData') || 'null')
-
+const data = JSON.parse(localStorage.getItem("user")) || {};
 const logout = () => {
 
   // Remove "userData" from localStorage
@@ -84,9 +84,14 @@ const logout = () => {
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-             Admin
+             {{ data.username }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle>{{
+             data.level === 0 ? 'Admin' :
+        data.level === 1 ? 'Nhân viên' :
+        data.level === 2 ? 'Đại lý' :
+        data.level === 3 ? 'CTV' :
+        data.level === 4 ? 'Người dùng' : 'Unknown' }}</VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />
