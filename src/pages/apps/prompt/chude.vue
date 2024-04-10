@@ -379,43 +379,7 @@ role.value = dataRole.level;
       </a-modal>
     </div>
     <VRow>
-      <VCol
-        v-for="meta in userListMeta"
-        :key="meta.title"
-        cols="12"
-        sm="6"
-        lg="3"
-      >
-        <VCard>
-          <VCardText class="d-flex justify-space-between">
-            <div>
-              <span>{{ meta.title }}</span>
-              <div class="d-flex align-center gap-2">
-                <h6 class="text-h6">
-                  {{ meta.stats }}
-                </h6>
-                <span
-                  :class="meta.percentage > 0 ? 'text-success' : 'text-error'"
-                  class="text-sm"
-                  >({{
-                    meta.percentage > 0
-                      ? `+${meta.percentage}`
-                      : meta.percentage
-                  }}%)</span
-                >
-              </div>
-              <span class="text-sm">{{ meta.subtitle }}</span>
-            </div>
-
-            <VAvatar
-              rounded
-              variant="tonal"
-              :color="meta.color"
-              :icon="meta.icon"
-            />
-          </VCardText>
-        </VCard>
-      </VCol>
+   
 
       <VCol cols="12">
         <VCard title="Quản lý Chủ đề">

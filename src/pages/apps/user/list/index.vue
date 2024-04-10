@@ -6,7 +6,7 @@ import { emailValidator, requiredValidator } from "@validators";
 import { onMounted, watch } from "vue";
 const userListStore = useUserListStore();
 const searchQuery = ref("");
-const selectedRole = ref('');
+const selectedRole = ref("");
 const selectedPlan = ref();
 const selectedStatus = ref();
 const rowPerPage = ref(10);
@@ -83,12 +83,12 @@ watchEffect(() => {
 watch(currentPage, (newVal, oldVal) => {
   fetchUsersPag(newVal);
 });
-const searchRoles = ref('')
+const searchRoles = ref("");
 // 👉 search filters
 const roles = ref([
   {
     title: "Tất cả",
-    value: '',
+    value: "",
   },
   {
     title: "Admin",
@@ -295,7 +295,7 @@ function resetEditValues() {
   Edit.value.goiDangKy1 = "";
   selectedQuyen.value = "";
 }
-const reduce = ref()
+const reduce = ref();
 
 const idUserEdit = ref();
 const selectedQuyen = ref();
@@ -308,7 +308,7 @@ const addMgtDaily = async () => {
         id_user: idUserEdit.value,
         maGioiThieu: AgencyMGT.value,
         role: selectedQuyen == 2 ? 0 : 1,
-        reduce: reduce.value
+        reduce: reduce.value,
       }
     );
     if (res.data.status) {
@@ -620,7 +620,7 @@ const DeletePack = async () => {
 const role = ref(0);
 onMounted(() => {
   const dataRole = JSON.parse(localStorage.getItem("user")) || {};
-  role.value = dataRole.level;  
+  role.value = dataRole.level;
   fetchUsers();
 });
 </script>
@@ -652,7 +652,7 @@ onMounted(() => {
       <VCol cols="12">
         <VCard title="Lọc người dùng">
           <VCardText>
-            <VRow style="justify-content:flex-start">
+            <VRow style="justify-content: flex-start">
               <!-- 👉 Select Role -->
 
               <VCol cols="12" sm="3">
@@ -664,7 +664,7 @@ onMounted(() => {
                   clear-icon="bx-x"
                 />
               </VCol>
-             
+
               <!-- 👉 Search  -->
               <VCol cols="12" sm="2">
                 <VTextField
@@ -844,15 +844,21 @@ onMounted(() => {
                   </a-dropdown>
                 </td>
                 <td>
-    <span class="text-base text-high-emphasis">{{
-        user.level === 0 ? 'Admin' :
-        user.level === 1 ? 'Nhân viên' :
-        user.level === 2 ? 'Đại lý' :
-        user.level === 3 ? 'CTV' :
-        user.level === 4 ? 'Người dùng' : 'Unknown'
-    }}</span>
-</td>
-              
+                  <span class="text-base text-high-emphasis">{{
+                    user.level === 0
+                      ? "Admin"
+                      : user.level === 1
+                      ? "Nhân viên"
+                      : user.level === 2
+                      ? "Đại lý"
+                      : user.level === 3
+                      ? "CTV"
+                      : user.level === 4
+                      ? "Người dùng"
+                      : "Unknown"
+                  }}</span>
+                </td>
+
                 <td>
                   <span class="text-base text-high-emphasis">{{
                     user.maGioiThieu
@@ -1210,7 +1216,7 @@ onMounted(() => {
                 item-value="value"
               />
             </VCol>
-        
+
             <VRow
               v-if="selectedQuyen == 2 || selectedQuyen == 3"
               style="padding: 12px"
