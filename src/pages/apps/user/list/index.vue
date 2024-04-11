@@ -3,7 +3,9 @@ import ThongKeUser from "@/pages/components/thongke.vue";
 import request from "@/utils/request";
 import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { emailValidator, requiredValidator } from "@validators";
+import { addMonths } from "date-fns";
 import { onMounted, watch } from "vue";
+
 const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref("");
@@ -31,7 +33,7 @@ const fetchUsers = async () => {
   apiKey.value = data.key;
   await request
     .get(
-      `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}`
+      `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}&date=${DateHH.value}`
     )
     .then((rss) => {
       if (rss.data.success) {
@@ -495,6 +497,7 @@ const EditPackprice = ref();
 const EditPackTime = ref();
 const UserFService = ref();
 const idServiceToEdit = ref();
+const HardTime = ref();
 const getUserById = async (id) => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
@@ -510,6 +513,7 @@ const getUserById = async (id) => {
         idServiceToEdit.value = rss.data.data[0].services[0].id;
         EditPackprice.value = rss.data.data[0].services[0].price;
         EditPackTime.value = rss.data.data[0].services[0].expiry_date;
+        HardTime.value = rss.data.data[0].services[0].expiry_date;
         loading.value = false;
       }
       loading.value = false;
@@ -534,6 +538,7 @@ const EditServiceForUser = async () => {
     })
     .then((rss) => {
       if (rss.data.status) {
+        dataDateTime.value = null;
         pushNotiSuccess();
         fetchUsers();
         isEditPack.value = false;
@@ -616,6 +621,44 @@ const DeletePack = async () => {
       pushNotiError();
     });
 };
+const dataDateTime = ref("");
+const selectTime = ref([
+  { label: "Thêm 1 tháng", value: 1 },
+  { label: "Thêm 2 tháng", value: 2 },
+  { label: "Thêm 3 tháng", value: 3 },
+  { label: "Thêm 6 tháng", value: 6 },
+  { label: "Thêm 1 năm", value: 12 },
+]);
+const FuncVal = ref();
+const listFunc = ref([
+  { label: "Người dùng hết hạn", value: 1 },
+  { label: "Đang phát triển", value: 2 },
+  { label: "Đang phát triển", value: 3 },
+]);
+const DateHH = ref();
+watch(dataDateTime, (newValue, oldVal) => {
+  if (newValue !== null && newValue !== undefined) {
+    console.log("EditPackTime", EditPackTime.value);
+    // Chuyển đổi EditPackTime thành đối tượng Date
+    const currentDate = new Date(HardTime.value);
+    // Kiểm tra nếu EditPackTime nhỏ hơn ngày hiện tại
+    if (currentDate < new Date()) {
+      // Lấy ngày hiện tại để cộng
+      currentDate = new Date();
+    }
+    // Cộng số tháng tương ứng với newValue vào EditPackTime
+    EditPackTime.value = addMonths(currentDate, newValue);
+    console.log("EditPackTime", EditPackTime.value);
+  }
+});
+const addTime = async () => {
+  loading.value = true;
+  try {
+  } catch (error) {
+    loading.value = false;
+    console.log(error);
+  }
+};
 // 👉 OnMounted
 const role = ref(0);
 onMounted(() => {
@@ -665,11 +708,31 @@ onMounted(() => {
                 />
               </VCol>
 
+              <VCol cols="12" sm="3">
+                <VSelect
+                  v-model="FuncVal"
+                  label="Chọn chức năng"
+                  :items="listFunc"
+                  item-title="label"
+                  item-value="value"
+                  clearable
+                  clear-icon="bx-x"
+                />
+              </VCol>
               <!-- 👉 Search  -->
               <VCol cols="12" sm="2">
                 <VTextField
                   v-model="searchQuery"
                   placeholder="Email or Username"
+                  density="compact"
+                  class="me-3"
+                />
+              </VCol>
+              <!-- 👉 Search  -->
+              <VCol cols="12" sm="2" v-if="FuncVal == 1">
+                <VTextField
+                  v-model="DateHH"
+                  placeholder="Nhập số ngày"
                   density="compact"
                   class="me-3"
                 />
@@ -797,7 +860,9 @@ onMounted(() => {
                 <!-- 👉 Ngày Hết Hạn -->
                 <td>
                   <span class="text-base text-high-emphasis">{{
-                    user.thoiGianHetHan
+                    user.services && user.services.length > 0
+                      ? user.services[0].expiry_date
+                      : "Chưa đăng ký gói cước"
                   }}</span>
                 </td>
 
@@ -986,7 +1051,7 @@ onMounted(() => {
       style="z-index: 2000"
     >
       <!-- Dialog Content -->
-      <VCard title="Edit User">
+      <VCard title="Edit Dịch vụ">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -1010,6 +1075,17 @@ onMounted(() => {
                 :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
               />
             </VCol>
+
+            <VCol col="8">
+              <VSelect
+                v-model="dataDateTime"
+                :items="selectTime"
+                label="Thêm thời hạn gói"
+                item-title="label"
+                item-value="value"
+              />
+            </VCol>
+
             <VCol cols="12">
               <VTextField
                 v-model="EditPackprice"
