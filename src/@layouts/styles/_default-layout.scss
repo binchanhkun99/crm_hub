@@ -8,7 +8,9 @@ html,
 body {
   min-block-size: 100%;
 }
-
+.ant-select-selector{
+  width: 360px !important;
+}
 .layout-page-content {
   @include mixins.boxed-content(true);
 
