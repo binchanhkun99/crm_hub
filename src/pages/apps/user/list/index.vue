@@ -28,6 +28,7 @@ const pageSize = ref(0);
 page.value = currentPage.value;
 // 👉 Fetching users
 const fetchUsers = async () => {
+  // console.log("selectedRole.value______>", selectedRole.value);
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
@@ -49,11 +50,12 @@ const fetchUsers = async () => {
       loading.value = false;
       // console.log(error);
     });
-  selectedRole.value = "";
+  // selectedRole.value = "";
   selectedPlan.value = "all";
 };
 // 👉 Fetching users
 const fetchUsersPag = async (page) => {
+
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
@@ -69,13 +71,14 @@ const fetchUsersPag = async (page) => {
         loading.value = false;
       }
       loading.value = false;
+      
     })
     .catch((error) => {
       loading.value = false;
       console.log(error);
     });
-  selectedRole.value = "all";
-  selectedPlan.value = "all";
+  // selectedRole.value = "all";
+  // selectedPlan.value = "all";
 };
 
 // 👉 watching current page
