@@ -22,15 +22,13 @@ const isDialogVisible = ref(false);
 
 const pageSize = ref(0);
 
-
-
-const pageMgt = ref(0)
-const rowPerPageMgt = ref(10)
-const users = ref([])
-const totalPageMgt = ref(10)
-const currentPageMgt = ref(0)
-const mgtListVal = ref()
-const pageSizeMgt = ref()
+const pageMgt = ref(0);
+const rowPerPageMgt = ref(10);
+const users = ref([]);
+const totalPageMgt = ref(10);
+const currentPageMgt = ref(0);
+const mgtListVal = ref();
+const pageSizeMgt = ref();
 
 page.value = currentPage.value;
 // 👉 Fetching chuDeList
@@ -91,8 +89,8 @@ const fetchBannerPag = async (page) => {
 // 👉 watching current page
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-  if (currentPageMgt.value > totalPageMgt.value) currentPageMgt.value = totalPageMgt.value;
-
+  if (currentPageMgt.value > totalPageMgt.value)
+    currentPageMgt.value = totalPageMgt.value;
 });
 
 watch(currentPage, (newVal, oldVal) => {
@@ -100,17 +98,17 @@ watch(currentPage, (newVal, oldVal) => {
 });
 
 // 👉 search filters
-const fetchUserbyMgt = async (page) =>{
-  loadingAddUser.value = true
+const fetchUserbyMgt = async (page) => {
+  loadingAddUser.value = true;
   await request
     .get(
       `api/getAllUser.php?key=${apiKey.value}&page=${page}&limit=${rowPerPageMgt.value}&maGioiThieu=${mgtListVal.value}`
     )
     .then((rss) => {
       if (rss.data.success) {
-        isListMagioiThieu.value = true
+        isListMagioiThieu.value = true;
         users.value = rss.data.data;
- 
+
         totalPage.value = rss.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loadingAddUser.value = false;
@@ -121,11 +119,10 @@ const fetchUserbyMgt = async (page) =>{
       loadingAddUser.value = false;
       console.log(error);
     });
-}
+};
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-
   const firstIndex = chuDeList.value.length
     ? currentPage.value * rowPerPage.value
     : 0;
@@ -134,8 +131,6 @@ const paginationData = computed(() => {
 
   return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
 });
-
-
 
 // 👉 Delete GPT
 const open = ref(false);
@@ -150,7 +145,6 @@ const handleOk = (e) => {
 };
 const deleteUser = async () => {
   try {
-
     const deleteUsr = await request.post(
       `api/admin/index.php?key=${apiKey.value}&action=delete_agency`,
       {
@@ -193,13 +187,15 @@ const Edit = ref({
   id_user: "",
   maGioiThieu: "",
   role: "",
-  reduce:""
+  reduce: "",
+  note: "",
 });
 function resetEditValues() {
   Edit.value.id_user = "";
   Edit.value.maGioiThieu = "";
   Edit.value.role;
-  Edit.value.reduce;
+  Edit.value.reduce = "";
+  Edit.value.note = "";
 }
 const idAgencyEdit = ref();
 // const isIDUSER = ref()
@@ -216,6 +212,7 @@ const showEdit = async (id) => {
       Edit.value.id_user = data.id_user;
       Edit.value.maGioiThieu = data.maGioiThieu;
       Edit.value.role = data.role;
+      Edit.value.note = data.note;
       Edit.value.reduce = data.reduce;
       loadingEdit.value = false;
       isDialogEdit.value = true;
@@ -248,7 +245,7 @@ const pushNotiError = () => {
     notiError.value = false;
   }, 2000);
 };
-const loadingAddUser = ref(false)
+const loadingAddUser = ref(false);
 const SaveEdit = async () => {
   try {
     loadingAddUser.value = true;
@@ -259,7 +256,8 @@ const SaveEdit = async () => {
         id_user: Edit.value.id_user,
         maGioiThieu: Edit.value.maGioiThieu,
         role: Edit.value.role,
-        reduce: Edit.value.reduce
+        reduce: Edit.value.reduce,
+        note: Edit.value.note,
         // user: Edit.value.ngayHetHan1,
         // user: Edit.value.ngayDangKy1,
       },
@@ -286,14 +284,14 @@ const SaveEdit = async () => {
   }
 };
 
-const isListMagioiThieu = ref(false)
+const isListMagioiThieu = ref(false);
 // 👉 Computing pagination data
 const paginationDataMgt = computed(() => {
   const firstIndex = users.value.length
-    ? currentPageMgt.value  * rowPerPageMgt.value
+    ? currentPageMgt.value * rowPerPageMgt.value
     : 0;
   const lastIndex =
-  users.value.length + currentPageMgt.value * rowPerPageMgt.value;
+    users.value.length + currentPageMgt.value * rowPerPageMgt.value;
 
   return `${firstIndex}-${lastIndex} of ${totalPageMgt.value}`;
 });
@@ -301,16 +299,16 @@ const paginationDataMgt = computed(() => {
 const selectedRows = ref([]);
 const selectAllUser = ref(false);
 
-const showListMgt = async (mgt) =>{ 
-mgtListVal.value = mgt;
-  loadingAddUser.value = true
+const showListMgt = async (mgt) => {
+  mgtListVal.value = mgt;
+  loadingAddUser.value = true;
   await request
     .get(
       `api/getAllUser.php?key=${apiKey.value}&page=${pageMgt.value}&limit=${rowPerPageMgt.value}&maGioiThieu=${mgt}`
     )
     .then((rss) => {
       if (rss.data.success) {
-        isListMagioiThieu.value = true
+        isListMagioiThieu.value = true;
         users.value = rss.data.data;
         totalPageMgt.value = rss.data.count;
         pageSizeMgt.value = Math.ceil(totalPageMgt.value / rowPerPageMgt.value);
@@ -322,8 +320,7 @@ mgtListVal.value = mgt;
       loadingAddUser.value = false;
       console.log(error);
     });
-  
-}
+};
 
 // 👉 watch if checkbox array is empty all select should be uncheck
 watch(
@@ -348,12 +345,11 @@ watch(
 );
 
 watch(currentPageMgt, (newVal, oldVal) => {
-  fetchUserbyMgt(newVal)
+  fetchUserbyMgt(newVal);
 });
 const role = ref(0);
 const dataRole = JSON.parse(localStorage.getItem("user")) || {};
 
-  
 role.value = dataRole.level;
 // 👉 OnMounted
 onMounted(() => {
@@ -405,6 +401,7 @@ onMounted(() => {
                 <th scope="col">Email</th>
                 <th scope="col">Mã giới thiệu</th>
                 <th scope="col">Giá</th>
+                <th scope="col">Ghi chú</th>
                 <th scope="col" v-if="role == 0 || role == 1">ACTIONS</th>
               </tr>
             </thead>
@@ -441,7 +438,6 @@ onMounted(() => {
                       <h6 class="text-sm" style="margin-bottom: 0px">
                         {{ user.maGioiThieu }}
                         <VBtn
-                          
                           style="height: 40px; width: 40px; margin-left: 4px"
                           color="warning"
                           icon="bx-cloud-upload"
@@ -460,8 +456,21 @@ onMounted(() => {
                     </div>
                   </div>
                 </td>
+                <td>
+                  <VTextarea v-if="user.note"
+                    style="width: 180px"
+                    v-model="user.note"
+                    label=""
+                  />
+                  
+                  <span v-else>Không có ghi chú</span>
+                </td>
                 <!-- 👉 Actions -->
-                <td class="text-center" style="width: 80px" v-if="role == 0 || role == 1">
+                <td
+                  class="text-center"
+                  style="width: 80px"
+                  v-if="role == 0 || role == 1"
+                >
                   <VBtn color="warning" style="margin-right: 8px">
                     <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
                   </VBtn>
@@ -592,6 +601,13 @@ onMounted(() => {
                 label="Giá"
               />
             </VCol>
+            <VCol cols="12">
+              <VTextarea
+                v-model="Edit.note"
+                :rules="[requiredValidator]"
+                label="Ghi chú"
+              />
+            </VCol>
           </VRow>
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
@@ -603,32 +619,29 @@ onMounted(() => {
       </VCard>
     </VDialog>
 
-
     <!-- List Mã giới thiệu  -->
-    <VDialog  
-   
-     v-model="isListMagioiThieu" max-width="800">
+    <VDialog v-model="isListMagioiThieu" max-width="800">
       <VRow>
-      <VCol cols="12">
-        <VCard title="Danh sách User theo mã giới thiệu">
-          <VDivider />
+        <VCol cols="12">
+          <VCard title="Danh sách User theo mã giới thiệu">
+            <VDivider />
 
-          <VCardText class="d-flex flex-wrap gap-4">
-            <!-- 👉 Export button -->
+            <VCardText class="d-flex flex-wrap gap-4">
+              <!-- 👉 Export button -->
 
-            <VSpacer />
+              <VSpacer />
 
-            <div class="d-flex align-center">
-              <!-- 👉 Add Agency button -->
-            </div>
-          </VCardText>
-          <VDivider />
-          <VProgressLinear v-if="loading" indeterminate color="primary" />
-          <VTable class="text-no-wrap">
-            <!-- 👉 table head -->
-            <thead>
-              <tr>
-                <!-- <th scope="col" style="width: 48px">
+              <div class="d-flex align-center">
+                <!-- 👉 Add Agency button -->
+              </div>
+            </VCardText>
+            <VDivider />
+            <VProgressLinear v-if="loading" indeterminate color="primary" />
+            <VTable class="text-no-wrap">
+              <!-- 👉 table head -->
+              <thead>
+                <tr>
+                  <!-- <th scope="col" style="width: 48px">
                   <VCheckbox
                     :model-value="selectAllUser"
                     :indeterminate="
@@ -639,99 +652,96 @@ onMounted(() => {
                     @click="selectUnselectAll"
                   />
                 </th> -->
-                <th scope="col">STT</th>
-                <th scope="col">User</th>
-                <th scope="col">Email</th>
-                <th scope="col">Mã giới thiệu</th>
-               
-              </tr>
-            </thead>
+                  <th scope="col">STT</th>
+                  <th scope="col">User</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Mã giới thiệu</th>
+                </tr>
+              </thead>
 
-            <!-- 👉 table body -->
-            <tbody>
-              <tr v-for="(user, index) in users" :key="index">
-                <td>
-                  <div class="d-flex align-center">
-                    {{ index + 1 }}
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex align-center">
-                    <div class="d-flex flex-column">
-                      <h6 class="text-sm">
-                        {{ user.user }}
-                      </h6>
+              <!-- 👉 table body -->
+              <tbody>
+                <tr v-for="(user, index) in users" :key="index">
+                  <td>
+                    <div class="d-flex align-center">
+                      {{ index + 1 }}
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex align-center">
-                    <div class="d-flex flex-column">
-                      <h6 class="text-sm">
-                        {{ user.mail }}
-                      </h6>
+                  </td>
+                  <td>
+                    <div class="d-flex align-center">
+                      <div class="d-flex flex-column">
+                        <h6 class="text-sm">
+                          {{ user.user }}
+                        </h6>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex align-center">
-                    <div class="d-flex flex-column">
-                      <h6 class="text-sm" style="margin-bottom: 0px">
-                        {{ user.maGioiThieu }}
-                   
-                      </h6>
+                  </td>
+                  <td>
+                    <div class="d-flex align-center">
+                      <div class="d-flex flex-column">
+                        <h6 class="text-sm">
+                          {{ user.mail }}
+                        </h6>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <!-- 👉 Actions -->
-            
-              </tr>
-            </tbody>
+                  </td>
+                  <td>
+                    <div class="d-flex align-center">
+                      <div class="d-flex flex-column">
+                        <h6 class="text-sm" style="margin-bottom: 0px">
+                          {{ user.maGioiThieu }}
+                        </h6>
+                      </div>
+                    </div>
+                  </td>
+                  <!-- 👉 Actions -->
+                </tr>
+              </tbody>
 
-            <!-- 👉 table footer  -->
-            <tfoot v-show="!users.length">
-              <tr>
-                <td colspan="7" class="text-center text-body-1">
-                  No data available
-                </td>
-              </tr>
-            </tfoot>
-          </VTable>
-          <VDivider />
+              <!-- 👉 table footer  -->
+              <tfoot v-show="!users.length">
+                <tr>
+                  <td colspan="7" class="text-center text-body-1">
+                    No data available
+                  </td>
+                </tr>
+              </tfoot>
+            </VTable>
+            <VDivider />
 
-          <!-- SECTION Pagination -->
-          <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
-            <!-- 👉 Rows per page -->
-            <div class="d-flex align-center" style="width: 171px">
-              <span class="text-no-wrap text-sm me-3">Rows per page:</span>
-              <VSelect
-                v-model="rowPerPageMgt"
-                density="compact"
-                class="per-page-select"
-                variant="plain"
-                :items="[10, 20, 30, 50]"
+            <!-- SECTION Pagination -->
+            <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
+              <!-- 👉 Rows per page -->
+              <div class="d-flex align-center" style="width: 171px">
+                <span class="text-no-wrap text-sm me-3">Rows per page:</span>
+                <VSelect
+                  v-model="rowPerPageMgt"
+                  density="compact"
+                  class="per-page-select"
+                  variant="plain"
+                  :items="[10, 20, 30, 50]"
+                />
+              </div>
+
+              <!-- 👉 Pagination and pagination meta -->
+              <div class="d-flex align-center">
+                <h6 class="text-sm font-weight-regular">
+                  {{ paginationDataMgt }}
+                </h6>
+              </div>
+              <VPagination
+                v-model="currentPageMgt"
+                size="small"
+                :total-visible="1"
+                :length="pageSizeMgt"
+                @next="selectedRowsMgt = []"
+                @prev="selectedRowsMgt = []"
               />
-            </div>
-
-            <!-- 👉 Pagination and pagination meta -->
-            <div class="d-flex align-center">
-              <h6 class="text-sm font-weight-regular">
-                {{ paginationDataMgt }}
-              </h6>
-            </div>
-            <VPagination
-              v-model="currentPageMgt"
-              size="small"
-              :total-visible="1"
-              :length="pageSizeMgt"
-              @next="selectedRowsMgt = []"
-              @prev="selectedRowsMgt = []"
-            />
-          </VCardText>
-          <!-- !SECTION -->
-        </VCard>
-      </VCol>
-    </VRow>
+            </VCardText>
+            <!-- !SECTION -->
+          </VCard>
+        </VCol>
+      </VRow>
     </VDialog>
   </section>
 </template>
