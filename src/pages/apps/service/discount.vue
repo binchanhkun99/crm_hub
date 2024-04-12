@@ -694,7 +694,7 @@ onMounted(() => {
     <!-- 👉 Edit New User -->
     <VDialog persistent v-model="isDialogEdit" max-width="600">
       <!-- Edit Dialog -->
-      <VCard title="Edit GPT Key">
+      <VCard title="Chỉnh sửa Discount">
         <DialogCloseBtn
           variant="text"
           size="small"

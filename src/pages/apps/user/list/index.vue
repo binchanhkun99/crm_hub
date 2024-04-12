@@ -59,7 +59,7 @@ const fetchUsersPag = async (page) => {
   apiKey.value = data.key;
   await request
     .get(
-      `api/getAllUser.php?key=${apiKey.value}&page=${page}&limit=${rowPerPage.value}&search=${searchQuery.value}`
+      `api/getAllUser.php?key=${apiKey.value}&page=${page}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}&date=${DateHH.value}`
     )
     .then((rss) => {
       if (rss.data.success) {
