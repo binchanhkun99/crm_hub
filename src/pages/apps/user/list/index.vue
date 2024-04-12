@@ -1267,9 +1267,8 @@ onMounted(() => {
                 @click:append-inner="show1 = !show1"
               />
             </VCol>
-            <VCol cols="12">
-              <!-- <VTextField v-model="Edit.ngayDangKy1" label="Ngày Đăng ký" 
-        :rules="[requiredValidator]"/> -->
+            <!-- <VCol cols="12">
+        
               <AppDateTimePicker
                 v-model="Edit.ngayDangKy1"
                 label="Ngày Đăng ký"
@@ -1282,7 +1281,7 @@ onMounted(() => {
                 label="Ngày Hết hạn"
                 :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               />
-            </VCol>
+            </VCol> -->
             <VCol cols="12">
               <VSelect
                 :items="items"
