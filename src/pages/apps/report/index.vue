@@ -199,31 +199,126 @@ const ExportExcel = async () => {
     const res = await request.post(
       `https://api-test.aidu.com.vn/api/admin/index.php?key=${apiKey.value}&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`
     );
-    if (res.data.data === true) {
-      window.open(
-        "https://api-test.aidu.com.vn/api/admin/report_data.xlsx",
-        "_blank"
-      );
-      console.log("Vô r");
+    console.log("res.data:", res.data.data.data);
+    if (res.data.status === true) {
+      console.log("aaaa");
+
+      const fileName = "Export_data_today";
+      const data = res.data.data.data;
+
+      // Thêm BOM vào đầu tệp CSV
+      const bom = "\uFEFF";
+      const csvContent = bom + convertDataToCSV(data);
+
+      // Tạo và tải tệp CSV
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `${fileName}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   } catch (error) {
     console.log(error);
   }
-  //   console.log("exportTable", exportTable.value);
-  //     const fileName = "np-data";
-  //   const data = invoiceData.value;
-  //   for (const item of data) {
-  //   if (item.des) {
-  //     item.des = unescape(item.des);
-  //   }
-  // }
-  // console.log(data);
-  //   const exportType = exportFromJSON.types.csv;
-  //   if (data) exportFromJSON({ data, fileName, exportType });
-  // const deleteUsr = await request.get(
-  //   `api/admin/index.php?key=${apiKey.value}&action=export_excel`
-  // );
-};
+}
+
+function convertDataToCSV(data) {
+  if (!data || !data.length) {
+    return '';
+  }
+
+  // Mapping giữa tên cột gốc và tên cột mới
+  const columnMappings = {
+    id_giaodich:'ID Giao Dịch',
+    user: 'Người dùng',
+    id_pack:'ID gói',
+    id_user:'ID người dùng',
+    maGioiThieu: 'Mã giới thiệu',
+    address: 'Địa chỉ',
+    id_discount: 'ID Discount',
+    money: 'Số tiền',
+    level: 'Quyền',
+    title_pack: 'Tên gói',
+    count: 'Số lượng',
+    createAt: 'Ngày tạo',
+    discount_code: 'Mã giảm giá',
+    id: 'ID',
+    // Các cột khác ở đây
+  };
+
+  const columns = Object.keys(data[0]);
+
+  // Tạo dòng header CSV từ các khóa
+  const header = columns.map(column => {
+    return columnMappings[column] || column; // Sử dụng tên cột mới nếu có hoặc giữ nguyên tên cột gốc
+  }).join(',') + '\n';
+
+  // Tạo các dòng dữ liệu từ mỗi đối tượng trong mảng
+  const rows = data.map((item) => {
+    return columns.map(column => {
+      let value = item[column];
+      if (typeof value === 'string' && value.includes(',')) {
+        value = `"${value}"`;
+      }
+      return value;
+    }).join(',');
+  }).join('\n');
+
+  return header + rows;
+}
+
+// const ExportExcel = async () => {
+//   if (!stDate.value || !endDate.value) {
+//     alert("Thời gian không được để trống!");
+//     return;
+//   }
+
+//   try {
+//     const res = await request.post(
+//       `https://api-test.aidu.com.vn/api/admin/index.php?key=${apiKey.value}&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`
+//     );
+//     console.log("res.data:", res.data);
+//     if (res.data.status === true) {
+//       console.log("aaaa");
+
+//       const fileName = "Export_data_today";
+//       const data = invoiceData.value;
+//       if (data) exportFromJSON({ data, fileName, exportType });
+
+   
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+//      // console.log("Vào đây chưa???");
+//       // window.open(
+//       //   "https://api-test.aidu.com.vn/api/admin/report_data.xlsx",
+//       //   "_blank"
+//       // );
+//       // console.log("Vô r");
+
+
+
+
+//   //   console.log("exportTable", exportTable.value);
+//   //     const fileName = "np-data";
+//   //   const data = invoiceData.value;
+//   //   for (const item of data) {
+//   //   if (item.des) {
+//   //     item.des = unescape(item.des);
+//   //   }
+//   // }
+//   // console.log(data);
+//   //   const exportType = exportFromJSON.types.csv;
+//   //   if (data) exportFromJSON({ data, fileName, exportType });
+//   // const deleteUsr = await request.get(
+//   //   `api/admin/index.php?key=${apiKey.value}&action=export_excel`
+//   // );
+// };
 const role = ref(0);
 // 👉 OnMounted
 onMounted(() => {
