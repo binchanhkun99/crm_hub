@@ -194,16 +194,17 @@ const ExportExcel = async () => {
     alert("Thời gian không được để trống!");
     return;
   }
-  console.log("stDate", stDate.value);
+
   try {
-    const res = request.posst(
-      `https://api-test.aidu.com.vn/api/admin/index.php?key=hrlvsfk8reh220jt30ui0muevl&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`
+    const res = await request.post(
+      `https://api-test.aidu.com.vn/api/admin/index.php?key=${apiKey.value}&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`
     );
-    if (res.data.status) {
+    if (res.data.data === true) {
       window.open(
-        "https://api-test.aidu.com.vn/api/admin/baocaodulieu.xlsx",
+        "https://api-test.aidu.com.vn/api/admin/report_data.xlsx",
         "_blank"
       );
+      console.log("Vô r");
     }
   } catch (error) {
     console.log(error);
@@ -219,9 +220,9 @@ const ExportExcel = async () => {
   // console.log(data);
   //   const exportType = exportFromJSON.types.csv;
   //   if (data) exportFromJSON({ data, fileName, exportType });
-  const deleteUsr = await request.get(
-    `api/admin/index.php?key=${apiKey.value}&action=export_excel`
-  );
+  // const deleteUsr = await request.get(
+  //   `api/admin/index.php?key=${apiKey.value}&action=export_excel`
+  // );
 };
 const role = ref(0);
 // 👉 OnMounted
@@ -277,13 +278,13 @@ onMounted(() => {
                 <AppDateTimePicker
                   v-model="stDate"
                   label="Thời gian bắt đầu"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+                  :config="{ enableTime: false, dateFormat: 'Y-m-d' }"
               /></VCol>
               <VCol cols="4" style="margin-top: 8px">
                 <AppDateTimePicker
                   v-model="endDate"
                   label="Thời gian kết thúc"
-                  :config="{ enableTime: true, dateFormat: 'Y-m-d' }"
+                  :config="{ enableTime: false, dateFormat: 'Y-m-d' }"
               /></VCol>
               <VCol cols="4">
                 <VCardText class="d-flex flex-wrap gap-4">
