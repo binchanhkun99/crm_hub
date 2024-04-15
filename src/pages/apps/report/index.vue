@@ -259,6 +259,7 @@ function convertDataToCSV(data) {
       if (typeof value === 'string' && value.includes(',')) {
         value = `"${value}"`;
       }
+      
       return value;
     }).join(',');
   }).join('\n');
