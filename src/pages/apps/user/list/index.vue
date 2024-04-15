@@ -654,6 +654,10 @@ watch(dataDateTime, (newValue, oldVal) => {
     console.log("EditPackTime", EditPackTime.value);
   }
 });
+const callItBack = () =>{
+  DateHH.value = undefined
+ 
+}
 const addTime = async () => {
   loading.value = true;
   try {
@@ -720,6 +724,7 @@ onMounted(() => {
                   item-value="value"
                   clearable
                   clear-icon="bx-x"
+                  @click:clear="callItBack()"
                 />
               </VCol>
               <!-- 👉 Search  -->
