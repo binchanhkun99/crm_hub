@@ -235,31 +235,26 @@ function convertDataToCSV(data) {
   const columnMappings = {
     id_giaodich:'ID Giao Dịch',
     user: 'Người dùng',
-    id_pack:'ID gói',
-    id_user:'ID người dùng',
     maGioiThieu: 'Mã giới thiệu',
     address: 'Địa chỉ',
-    id_discount: 'ID Discount',
     money: 'Số tiền',
-    level: 'Quyền',
     title_pack: 'Tên gói',
     count: 'Số lượng',
     createAt: 'Ngày tạo',
     discount_code: 'Mã giảm giá',
-    id: 'ID',
     // Các cột khác ở đây
   };
 
   const columns = Object.keys(data[0]);
 
   // Tạo dòng header CSV từ các khóa
-  const header = columns.map(column => {
+  const header = columns.filter(column => !['id_pack', 'id', 'id_user', 'id_discount', 'status', 'level'].includes(column)).map(column => {
     return columnMappings[column] || column; // Sử dụng tên cột mới nếu có hoặc giữ nguyên tên cột gốc
   }).join(',') + '\n';
 
   // Tạo các dòng dữ liệu từ mỗi đối tượng trong mảng
   const rows = data.map((item) => {
-    return columns.map(column => {
+    return columns.filter(column => !['id_pack', 'id', 'id_user', 'id_discount', 'status', 'level'].includes(column)).map(column => {
       let value = item[column];
       if (typeof value === 'string' && value.includes(',')) {
         value = `"${value}"`;
@@ -270,6 +265,7 @@ function convertDataToCSV(data) {
 
   return header + rows;
 }
+
 
 // const ExportExcel = async () => {
 //   if (!stDate.value || !endDate.value) {
