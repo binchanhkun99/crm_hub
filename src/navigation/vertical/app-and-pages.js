@@ -18,7 +18,7 @@ export default [
     ],
   },
   {
-    title: 'GPT & DS',
+    title: 'GPT & 3P',
     icon: { icon: 'bx-paint' },
     children: [
       { title: 'Config', to: 'apps-gptvsdfs' },

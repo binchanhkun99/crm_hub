@@ -24,16 +24,30 @@ const fetchConfig = async () => {
 const loading = ref(false);
 const items = ref([
   { label: "GPT", value: 1 },
-  { label: "Stable Diffusion", value: 2 },
+  { label: "3P", value: 2 },
 ]);
 
+const notiSuccess = ref(false);
+const notiError = ref(false);
+const pushNotiSuccess = () => {
+  notiSuccess.value = true;
+  setTimeout(() => {
+    notiSuccess.value = false;
+  }, 2000);
+};
+const pushNotiError = () => {
+  notiError.value = true;
+  setTimeout(() => {
+    notiError.value = false;
+  }, 2000);
+};
 const itemsSol = ref([
   { label: "512*512", value: "512*512" },
 ]);
 const saveConfigImage = async ()=>{
     loading.value = true
     try {
-        const res = request.post(`api/admin/index.php?key=${apiKey.value}&action=sd_edit`,{
+        const res = await request.post(`api/admin/index.php?key=${apiKey.value}&action=sd_edit`,{
             redirect: selectAI.value,
             image_size: Resolution.value
         },
@@ -41,18 +55,22 @@ const saveConfigImage = async ()=>{
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/x-www-form-urlencoded",
       })
+      // console.log("gugu", res);
       if(res.data.data===1){
         fetchConfig()
+        pushNotiSuccess()
         loading.value = false
       }
       else{
         loading.value = false
+        pushNotiError()
       }
         
 
         
     } catch (error) {
         loading.value = false
+        pushNotiError()
     }
 }
 const role = ref(0);
@@ -101,7 +119,7 @@ role.value = dataRole.level;
             </VCol>
           </VRow>
           <VRow>
-            <VCol cols="12">
+            <!-- <VCol cols="12">
               <VSelect
                 :items="itemsSol"
                 label="Select Độ Phân Giải"
@@ -111,7 +129,7 @@ role.value = dataRole.level;
                 item-value="value"
               >
               </VSelect>
-            </VCol>
+            </VCol> -->
             <div class="btn">
               <VBtn @click="saveConfigImage" color="primary"> Save </VBtn>
             </div>
@@ -119,6 +137,24 @@ role.value = dataRole.level;
         </VCardText>
       </VCard>
     </VCol>
+    
+      <!-- Success-->
+      <VDialog v-model="notiSuccess" width="300">
+        <VCard color="primary" width="300">
+          <VAlert type="success">
+            <strong>Thành công</strong>
+          </VAlert>
+        </VCard>
+      </VDialog>
+
+      <!-- Error-->
+      <VDialog v-model="notiError" width="300">
+        <VCard color="primary" width="300">
+          <VAlert type="error">
+            <strong>Đã có lỗi xẩy ra vui lòng thử lại sau</strong>
+          </VAlert>
+        </VCard>
+      </VDialog>
   </section>
 </template>
 
