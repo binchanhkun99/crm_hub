@@ -635,8 +635,8 @@ const selectTime = ref([
 const FuncVal = ref();
 const listFunc = ref([
   { label: "Người dùng hết hạn", value: 1 },
-  { label: "Đang phát triển", value: 2 },
-  { label: "Đang phát triển", value: 3 },
+  // { label: "Đang phát triển", value: 2 },
+  // { label: "Đang phát triển", value: 3 },
 ]);
 const DateHH = ref();
 watch(dataDateTime, (newValue, oldVal) => {
