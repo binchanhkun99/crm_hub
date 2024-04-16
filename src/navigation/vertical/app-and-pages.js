@@ -14,7 +14,7 @@ export default [
     icon: { icon: 'bx-file' },
     children: [
       { title: 'GPT', to: 'apps-invoice-list' },
-      { title: 'Banner', to: { name: 'apps-banner'} },
+      // { title: 'Banner', to: { name: 'apps-banner'} },
     ],
   },
   {

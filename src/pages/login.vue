@@ -1,10 +1,9 @@
 <script setup>
 import store from "@/store";
-import AuthProvider from "@/views/pages/authentication/AuthProvider.vue";
 import { VNodeRenderer } from "@layouts/components/VNodeRenderer";
 import { themeConfig } from "@themeConfig";
 import {
-  requiredValidator
+requiredValidator
 } from "@validators";
 import { useRouter } from "vue-router";
 import { VForm } from "vuetify/components/VForm";
@@ -167,7 +166,7 @@ const onSubmit = () => {
 
               <!-- auth providers -->
               <VCol cols="12" class="text-center">
-                <AuthProvider />
+                <!-- <AuthProvider /> -->
               </VCol>
             </VRow>
           </VForm>
