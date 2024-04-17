@@ -98,7 +98,7 @@ const fetchBannerPag = async (page) => {
         chuDeList.value = rss.data.data;
 
         totalPage.value = rss.data.count;
-    
+
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
       }
@@ -119,8 +119,6 @@ watchEffect(() => {
 watch(currentPage, (newVal, oldVal) => {
   fetchBannerPag(newVal);
 });
-
-
 
 const isAddNewUserDrawerVisible = ref(false);
 
@@ -219,15 +217,16 @@ const addUser = async () => {
 
 // 👉 Add Sub chủ đề
 const isNewSub = ref(false);
-const selectChuDe = ref()
+const selectChuDe = ref();
+const lsChuDe = ref([]);
 const addSubChuDe = async () => {
-    loadingEdit.value = true;
+  loadingEdit.value = true;
   //get chủ đề
   try {
     const res = await request.get(`api/getType.php?type=ChuDe`);
     if (res.data.status) {
       chuDeList.value = res.data.data.filter((item) => item.ChuDe !== "");
-      ListChuDe.value = chuDeList.value.map((item) => item.ChuDe);
+      lsChuDe.value = chuDeList.value.map((item) => item.ChuDe);
       isNewSub.value = true;
       loadingEdit.value = false;
     } else {
@@ -238,24 +237,39 @@ const addSubChuDe = async () => {
     loadingEdit.value = false;
   }
 };
-const subChuDe= ref()
-const addSubChuDeFinal = async ()=>{
-    loadingAddUser.value = true;
-    const response = await request.post(`api/addSubChuDe.php`, {
-      chuDe: selectChuDe.value,
-      subChuDe: subChuDe.value
-    });
-    if (response.data.status) {
-      loadingAddUser.value = false;
-      isNewSub.value = false;
-      fetchBanner();
-      pushNotiSuccess();
-    } else {
-        isNewSub.value = false;
-      loadingAddUser.value = false;
-      pushNotiError();
-    }
-}
+const subChuDe = ref();
+const listSubCD = ref([]);
+watch(selectChuDe, async (newVal, oldVal) => {
+  loadingEdit.value = true;
+  try {
+    await request
+      .post("api/getSubChuDe.php", JSON.stringify({ chuDe: newVal }))
+      .then((res) => {
+        loadingEdit.value = false;
+        listSubCD.value = res.data.data;
+      });
+  } catch (error) {
+    loadingEdit.value = false;
+  }
+});
+
+const addSubChuDeFinal = async () => {
+  loadingAddUser.value = true;
+  const response = await request.post(`api/addSubChuDe.php`, {
+    chuDe: selectChuDe.value,
+    subChuDe: subChuDe.value,
+  });
+  if (response.data.status) {
+    loadingAddUser.value = false;
+    isNewSub.value = false;
+    fetchBanner();
+    pushNotiSuccess();
+  } else {
+    isNewSub.value = false;
+    loadingAddUser.value = false;
+    pushNotiError();
+  }
+};
 // 👉 Edit Chủ đề
 const loadingEdit = ref(false);
 const isDialogEdit = ref(false);
@@ -356,13 +370,13 @@ const role = ref(0);
 onMounted(() => {
   const dataRole = JSON.parse(localStorage.getItem("user")) || {};
 
-role.value = dataRole.level;
+  role.value = dataRole.level;
   fetchBanner();
 });
 </script>
 
 <template>
-    <section v-if="role!=0">
+  <section v-if="role != 0">
     <a-result
       status="500"
       title="401"
@@ -379,8 +393,6 @@ role.value = dataRole.level;
       </a-modal>
     </div>
     <VRow>
-   
-
       <VCol cols="12">
         <VCard title="Quản lý Chủ đề">
           <VDivider />
@@ -392,10 +404,7 @@ role.value = dataRole.level;
 
             <div class="d-flex align-center">
               <!-- 👉 Add Chủ đề button -->
-              <VBtn
-                style="margin-right: 12px"
-                @click="addSubChuDe"
-              >
+              <VBtn style="margin-right: 12px" @click="addSubChuDe">
                 Add Sub Chủ đề
               </VBtn>
               <!-- 👉 Add Sub Chủ đề button -->
@@ -440,8 +449,7 @@ role.value = dataRole.level;
                   <div class="d-flex align-center">
                     <div class="d-flex flex-column">
                       <h6 class="text-sm">
-                        {{ user }}
-                    
+                        {{ user.ChuDe }}
                       </h6>
                     </div>
                   </div>
@@ -545,20 +553,70 @@ role.value = dataRole.level;
             <VCol cols="12">
               <VSelect
                 v-model="selectChuDe"
-                :items="ListChuDe"
+                :items="lsChuDe"
                 label="Chủ đề"
                 persistent-hint
                 return-object
                 single-line
               />
-
             </VCol>
             <VCol cols="12">
-                <VTextField
+              <VTextField
                 v-model="subChuDe"
                 label="SubChuDe"
                 :rules="[requiredValidator]"
               />
+            </VCol>
+            <VCol cols="12" v-if="seconlectChuDe">
+              <VTable class="text-no-wrap">
+                <!-- 👉 table head -->
+                <thead>
+                  <tr>
+                    <!-- <th scope="col" style="width: 48px">
+                  <VCheckbox
+                    :model-value="selectAllUser"
+                    :indeterminate="
+                      chuDeList.length !== selectedRows.length &&
+                      !!selectedRows.length
+                    "
+                    class="mx-1"
+                    @click="selectUnselectAll"
+                  />
+                </th> -->
+                    <th scope="col">STT</th>
+                    <th scope="col">Sub Chủ đề</th>
+
+                    <!-- <th scope="col">ACTIONS</th> -->
+                  </tr>
+                </thead>
+
+                <!-- 👉 table body -->
+                <tbody>
+                  <tr v-for="(user, index) in listSubCD" :key="index">
+                    <td>
+                      <div class="d-flex align-center">
+                        {{ index + 1 }}
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex align-center">
+                        <div class="d-flex flex-column">
+                          <h6 class="text-sm">
+                            {{ user }}
+                          </h6>
+                        </div>
+                      </div>
+                    </td>
+                    <!-- 👉 Actions -->
+                    <!-- <td class="text-center" style="width: 80px">
+                      <VBtn color="error" @click="showModal(user.id)">
+                        <VIcon icon="bx-trash" />
+                      </VBtn>
+                    
+                    </td> -->
+                  </tr>
+                </tbody>
+              </VTable>
             </Vcol>
           </VRow>
         </VCardText>

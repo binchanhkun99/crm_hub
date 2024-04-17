@@ -199,10 +199,8 @@ const ExportExcel = async () => {
     const res = await request.post(
       `https://api-test.aidu.com.vn/api/admin/index.php?key=${apiKey.value}&action=export_excel&day_start=${stDate.value}&day_end=${endDate.value}`
     );
-    console.log("res.data:", res.data.data.data);
+ 
     if (res.data.status === true) {
-      console.log("aaaa");
-
       const fileName = "Export_data_today";
       const data = res.data.data.data;
 

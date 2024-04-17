@@ -13,7 +13,6 @@ class AuthService {
       const response = await request.post(API_URL_LOGIN, dataForm);
   
       const data = response.data;
-      console.log("Đmmm data = mấy",data.level); // In ra dữ liệu để kiểm tra
   
       if ( data.level == 0 ||  data.level == 1 ||  data.level == 2 ||  data.level == 3) {
        
