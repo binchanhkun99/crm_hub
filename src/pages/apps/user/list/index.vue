@@ -30,7 +30,7 @@ page.value = currentPage.value;
 const fetchUsers = async () => {
   // console.log("selectedRole.value______>", selectedRole.value);
   loading.value = true;
-  let offset = (page.value - 1) * rowPerPage.value;
+  let offset = (page.value - 1);
 
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
@@ -58,7 +58,8 @@ const fetchUsers = async () => {
 // 👉 Fetching users
 const fetchUsersPag = async (page) => {
   loading.value = true;
-  let offset = (page - 1) * rowPerPage.value;
+  console.log("cr", page)
+  let offset = (page - 1);
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
