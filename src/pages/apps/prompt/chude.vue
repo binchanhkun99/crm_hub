@@ -228,6 +228,7 @@ const addSubChuDe = async () => {
     if (res.data.status) {
       chuDeList.value = res.data.data.filter((item) => item.ChuDe !== "");
       ListChuDe.value = chuDeList.value.map((item) => item.ChuDe);
+      console.log(" chuDeList.value",  ListChuDe.value);
       isNewSub.value = true;
       loadingEdit.value = false;
     } else {
@@ -440,7 +441,8 @@ role.value = dataRole.level;
                   <div class="d-flex align-center">
                     <div class="d-flex flex-column">
                       <h6 class="text-sm">
-                        {{ user.ChuDe }}
+                        {{ user }}
+                    
                       </h6>
                     </div>
                   </div>

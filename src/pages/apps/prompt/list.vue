@@ -245,8 +245,6 @@ const beforAdd = async () => {
 
 // 👉 Watch chủ đề chính get chủ đề con
 watch(_ChuDe, async (newVal, oldVal) => {
-  // Đảm bảo giá trị mới không trống và không phải là giá trị mặc định
-
   loadingEdit.value = true;
   try {
     const res = await request.post(
