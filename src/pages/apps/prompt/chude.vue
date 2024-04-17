@@ -567,7 +567,7 @@ onMounted(() => {
                 :rules="[requiredValidator]"
               />
             </VCol>
-            <VCol cols="12" v-if="seconlectChuDe">
+            <VCol cols="12" v-if="selectChuDe">
               <VTable class="text-no-wrap">
                 <!-- 👉 table head -->
                 <thead>
