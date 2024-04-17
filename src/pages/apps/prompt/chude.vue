@@ -228,7 +228,6 @@ const addSubChuDe = async () => {
     if (res.data.status) {
       chuDeList.value = res.data.data.filter((item) => item.ChuDe !== "");
       ListChuDe.value = chuDeList.value.map((item) => item.ChuDe);
-      console.log(" chuDeList.value",  ListChuDe.value);
       isNewSub.value = true;
       loadingEdit.value = false;
     } else {
