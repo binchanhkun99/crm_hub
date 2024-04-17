@@ -517,7 +517,7 @@ onMounted(() => {
             <VPagination
               v-model="currentPage"
               size="small"
-              :total-visible="1"
+              :total-visible="7"
               :length="pageSize"
               @next="selectedRows = []"
               @prev="selectedRows = []"
@@ -732,7 +732,7 @@ onMounted(() => {
               <VPagination
                 v-model="currentPageMgt"
                 size="small"
-                :total-visible="1"
+                :total-visible="7"
                 :length="pageSizeMgt"
                 @next="selectedRowsMgt = []"
                 @prev="selectedRowsMgt = []"

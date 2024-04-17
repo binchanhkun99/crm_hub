@@ -12,13 +12,13 @@ const selectedRole = ref("");
 const selectedPlan = ref();
 const selectedStatus = ref();
 const rowPerPage = ref(10);
-const currentPage = ref(0);
+const currentPage = ref(1);
 const totalPage = ref(10);
 const totalUsers = ref(0);
 const users = ref([]);
 const loading = ref(false);
 const apiKey = ref();
-const page = ref();
+const page = ref(1);
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
@@ -30,11 +30,13 @@ page.value = currentPage.value;
 const fetchUsers = async () => {
   // console.log("selectedRole.value______>", selectedRole.value);
   loading.value = true;
+  let offset = (page.value - 1) * rowPerPage.value;
+
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
     .get(
-      `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}&date=${DateHH.value}`
+      `api/getAllUser.php?key=${apiKey.value}&page=${offset}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}&date=${DateHH.value}`
     )
     .then((rss) => {
       if (rss.data.success) {
@@ -55,13 +57,13 @@ const fetchUsers = async () => {
 };
 // 👉 Fetching users
 const fetchUsersPag = async (page) => {
-
   loading.value = true;
+  let offset = (page - 1) * rowPerPage.value;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
     .get(
-      `api/getAllUser.php?key=${apiKey.value}&page=${page}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}&date=${DateHH.value}`
+      `api/getAllUser.php?key=${apiKey.value}&page=${offset}&limit=${rowPerPage.value}&search=${searchQuery.value}&level=${selectedRole.value}&date=${DateHH.value}`
     )
     .then((rss) => {
       if (rss.data.success) {
@@ -71,7 +73,6 @@ const fetchUsersPag = async (page) => {
         loading.value = false;
       }
       loading.value = false;
-      
     })
     .catch((error) => {
       loading.value = false;
@@ -654,10 +655,9 @@ watch(dataDateTime, (newValue, oldVal) => {
     console.log("EditPackTime", EditPackTime.value);
   }
 });
-const callItBack = () =>{
-  DateHH.value = undefined
- 
-}
+const callItBack = () => {
+  DateHH.value = undefined;
+};
 const addTime = async () => {
   loading.value = true;
   try {
@@ -788,8 +788,10 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">User Name/Email</th>
+                <th scope="col">User Name</th>
+                <th scope="col">Email</th>
                 <th scope="col">Quốc Gia</th>
+                <th scope="col">SĐT</th>
                 <th scope="col">Ngày Đăng Ký</th>
                 <th scope="col">Ngày Hết Hạn</th>
                 <th scope="col">Gói Đăng Ký</th>
@@ -802,20 +804,10 @@ onMounted(() => {
             <!-- 👉 table body -->
             <tbody>
               <tr v-for="(user, index) in users" :key="index">
-                <!-- 👉 Checkbox -->
-                <!-- <td>
-                  <VCheckbox
-                    :id="`check${user.id}`"
-                    :model-value="selectedRows.includes(`check${user.id}`)"
-                    class="mx-1"
-                    @click="addRemoveIndividualCheckbox(`check${user.id}`)"
-                  />
-                </td> -->
-
                 <!-- 👉 User -->
                 <td>
                   <div class="d-flex align-center">
-                    {{ index + 1 }}
+                    {{ (currentPage - 1) * rowPerPage + index + 1 }}
                   </div>
                 </td>
                 <td>
@@ -844,17 +836,24 @@ onMounted(() => {
                         {{ user.user }}
                         <!-- </RouterLink> -->
                       </h6>
-                      <span class="text-xs text-medium-emphasis">{{
-                        user.mail
-                      }}</span>
                     </div>
                   </div>
                 </td>
-
+                <!-- 👉 Email -->
+                <td>
+                  <span class="text-capitalize text-base">{{ user.mail }}</span>
+                </td>
                 <!-- 👉 Country -->
                 <td>
                   <span class="text-capitalize text-base">{{
                     user.country
+                  }}</span>
+                </td>
+
+                <!-- 👉 Phone -->
+                <td>
+                  <span class="text-capitalize text-base">{{
+                    user.phone
                   }}</span>
                 </td>
 
@@ -989,8 +988,7 @@ onMounted(() => {
             </div>
             <VPagination
               v-model="currentPage"
-              size="small"
-              :total-visible="1"
+              :total-visible="7"
               :length="pageSize"
               @next="selectedRows = []"
               @prev="selectedRows = []"
