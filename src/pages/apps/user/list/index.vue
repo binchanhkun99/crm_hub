@@ -58,7 +58,6 @@ const fetchUsers = async () => {
 // 👉 Fetching users
 const fetchUsersPag = async (page) => {
   loading.value = true;
-  console.log("cr", page)
   let offset = (page - 1);
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
@@ -495,7 +494,6 @@ const EditService = async (id) => {
   getUserById(idUsEditService.value);
   getListServiceEdit();
 
-  console.log("Edit");
 };
 const EditPackID = ref();
 const EditPackprice = ref();

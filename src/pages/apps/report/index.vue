@@ -11,13 +11,13 @@ const selectedRole = ref();
 const selectedPlan = ref();
 const selectedStatus = ref();
 const rowPerPage = ref(10);
-const currentPage = ref(0);
+const currentPage = ref(1);
 const totalPage = ref(10);
 const totalUsers = ref(0);
 const invoiceData = ref([]);
 const loading = ref(false);
 const apiKey = ref();
-const page = ref();
+const page = ref(1);
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
@@ -30,10 +30,10 @@ const fetchInvoice = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
-
+  let offset = (page.value - 1);
   await request
     .get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page.value}&action=list_bills`
+      `api/admin/index.php?key=${apiKey.value}&page=${offset}&action=list_bills&limit=${rowPerPage.value}`
     )
     .then((rss) => {
       if (rss.data.status) {
@@ -55,10 +55,11 @@ const fetchInvoice = async () => {
 const fetchBannerPag = async (page) => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
+  let offset = (page - 1);
   apiKey.value = data.key;
   await request
     .get(
-      `api/admin/index.php?key=${apiKey.value}&page=${page}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=banner_list`
+      `api/admin/index.php?key=${apiKey.value}&page=${offset}&limit=${rowPerPage.value}&search=${searchQuery.value}&action=banner_list`
     )
     .then((rss) => {
       if (rss.data.success) {

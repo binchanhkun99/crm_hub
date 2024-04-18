@@ -567,22 +567,15 @@ onMounted(() => {
                 :rules="[requiredValidator]"
               />
             </VCol>
-            <VCol cols="12" v-if="selectChuDe">
+            <VCol
+              cols="12"
+              style="max-height: 350px; overflow: auto"
+              v-if="selectChuDe"
+            >
               <VTable class="text-no-wrap">
                 <!-- 👉 table head -->
                 <thead>
                   <tr>
-                    <!-- <th scope="col" style="width: 48px">
-                  <VCheckbox
-                    :model-value="selectAllUser"
-                    :indeterminate="
-                      chuDeList.length !== selectedRows.length &&
-                      !!selectedRows.length
-                    "
-                    class="mx-1"
-                    @click="selectUnselectAll"
-                  />
-                </th> -->
                     <th scope="col">STT</th>
                     <th scope="col">Sub Chủ đề</th>
 
@@ -617,7 +610,7 @@ onMounted(() => {
                   </tr>
                 </tbody>
               </VTable>
-            </Vcol>
+            </VCol>
           </VRow>
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">

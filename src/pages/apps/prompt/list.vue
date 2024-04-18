@@ -11,13 +11,13 @@ const selectedRole = ref();
 const selectedPlan = ref();
 const selectedStatus = ref();
 const rowPerPage = ref(10);
-const currentPage = ref(0);
+const currentPage = ref(1);
 const totalPage = ref(10);
 const totalUsers = ref(0);
 const dataPrompt = ref([]);
 const loading = ref(false);
 const apiKey = ref();
-const page = ref();
+const page = ref(1);
 const show1 = ref(false);
 
 const isDialogVisible = ref(false);
@@ -61,12 +61,13 @@ const pageSize = ref(0);
 page.value = currentPage.value;
 // 👉 Fetching dataPrompt
 const fetchPackage = async () => {
+  let offset = (page.value - 1);
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
     .get(
-      `api/getPromtList.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}&search=${searchQuery.value}`
+      `api/getPromtList.php?key=${apiKey.value}&page=${offset}&limit=${rowPerPage.value}&search=${searchQuery.value}`
     )
     .then((rss) => {
       if (rss.data.status) {
@@ -87,13 +88,13 @@ const fetchPackage = async () => {
 // 👉 Fetching dataPrompt
 const fetchPackagePag = async (page) => {
   dataPrompt.value = [];
-
+  let offset = (page - 1);
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
     .get(
-      `api/getPromtList.php?key=${apiKey.value}&page=${page}&limit=${rowPerPage.value}&search=${searchQuery.value}`
+      `api/getPromtList.php?key=${apiKey.value}&page=${offset}&limit=${rowPerPage.value}&search=${searchQuery.value}`
     )
     .then((rss) => {
       if ((rss.data.status = "success")) {
@@ -720,8 +721,7 @@ onMounted(async () => {
                 <!-- 👉 User -->
                 <td>
                   <div class="d-flex align-center">
-                    {{ index + 1 }}
-                  </div>
+                    {{ (currentPage - 1) * rowPerPage + index + 1 }}                  </div>
                 </td>
                 <td>
                   <div class="d-flex align-center">
