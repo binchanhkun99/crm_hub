@@ -2,15 +2,15 @@
 import { VForm } from "vuetify/components/VForm";
 
 import { useGenerateImageVariant } from "@/@core/composable/useGenerateImageVariant";
-import AuthProvider from "@/views/pages/authentication/AuthProvider.vue";
+
 import girlWithLaptopDark from "@images/illustrations/girl-with-laptop-dark.png";
 import girlWithLaptopLight from "@images/illustrations/girl-with-laptop-light.png";
 import { VNodeRenderer } from "@layouts/components/VNodeRenderer";
 import { themeConfig } from "@themeConfig";
 import {
-  alphaDashValidator,
-  emailValidator,
-  requiredValidator,
+alphaDashValidator,
+emailValidator,
+requiredValidator,
 } from "@validators";
 import { useRouter } from 'vue-router';
 
@@ -204,7 +204,7 @@ const onSubmit = () => {
 
               <!-- auth providers -->
               <VCol cols="12" class="text-center">
-                <AuthProvider />
+             
               </VCol>
             </VRow>
           </VForm>

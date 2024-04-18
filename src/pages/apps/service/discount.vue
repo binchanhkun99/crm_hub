@@ -1,9 +1,7 @@
 <script setup>
 import request from "@/utils/request";
-import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { requiredValidator } from "@validators";
 import { onMounted, watch } from "vue";
-const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref();
 const selectedPlan = ref();

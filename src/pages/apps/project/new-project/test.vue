@@ -1,9 +1,7 @@
 <script setup>
 import request from "@/utils/request";
-import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { ref, watch } from "vue";
 
-const userListStore = useUserListStore();
 const newUser = ref("");
 const selectedRole = ref();
 const selectedPlan = ref();

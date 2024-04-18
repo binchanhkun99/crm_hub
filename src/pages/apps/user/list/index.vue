@@ -1,12 +1,10 @@
 <script setup>
 import ThongKeUser from "@/pages/components/thongke.vue";
 import request from "@/utils/request";
-import { useUserListStore } from "@/views/apps/user/useUserListStore";
 import { emailValidator, requiredValidator } from "@validators";
 import { addMonths } from "date-fns";
 import { onMounted, watch } from "vue";
 
-const userListStore = useUserListStore();
 const searchQuery = ref("");
 const selectedRole = ref("");
 const selectedPlan = ref();
@@ -117,6 +115,8 @@ const roles = ref([
     value: 4,
   },
 ]);
+
+
 
 const plans = ref([
   {
