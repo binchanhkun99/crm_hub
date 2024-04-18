@@ -12,6 +12,9 @@ import vuetify from 'vite-plugin-vuetify'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    historyApiFallback: true
+  },
   plugins: [
     vue(),
     vueJsx(),
@@ -95,7 +98,6 @@ export default defineConfig({
 
   build: {
     chunkSizeWarningLimit: 5000,
-    rollupOptions: {}
   },
   optimizeDeps: {
     exclude: ['vuetify'],
