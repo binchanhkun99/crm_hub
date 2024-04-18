@@ -290,6 +290,7 @@ const Edit = ref({
   ngayHetHan1: "",
   goiDangKy1: "",
   AgencyMGT: "",
+  phone:""
 });
 function resetEditValues() {
   Edit.value.email1 = "";
@@ -299,6 +300,7 @@ function resetEditValues() {
   Edit.value.ngayDangKy1 = "";
   Edit.value.ngayHetHan1 = "";
   Edit.value.goiDangKy1 = "";
+  Edit.value.phone = "";
   selectedQuyen.value = "";
 }
 const reduce = ref();
@@ -345,6 +347,7 @@ const showEdit = async (id) => {
       Edit.value.maGioiThieuAdd1 = data.user.maGioiThieu;
       Edit.value.ngayDangKy1 = data.user.thoiGianDangKy;
       Edit.value.ngayHetHan1 = data.user.thoiGianHetHan;
+      Edit.value.phone = data.user.phone;
       selectedQuyen.value = data.user.level;
       AgencyMGT.value = data.user.acency?.maGioiThieu;
       Edit.value.goiDangKy1 = data.service || "Chưa đăng ký dịch vụ nào";
@@ -386,6 +389,7 @@ const SaveEdit = async () => {
         level: selectedQuyen.value,
         pass: Edit.value.password1,
         maGioiThieu: Edit.value.maGioiThieuAdd1,
+        phone: Edit.value.phone
         // user: Edit.value.ngayHetHan1,
         // user: Edit.value.ngayDangKy1,
       },
@@ -396,24 +400,10 @@ const SaveEdit = async () => {
     );
     if (res.data.data == 1) {
       loadingAddUser.value = false;
-      pushNotiSuccess();
-      await request
-        .get(
-          `api/getAllUser.php?key=${apiKey.value}&page=${page.value}&limit=${rowPerPage.value}`
-        )
-        .then((rss) => {
-          if (rss.data.success) {
-            users.value = rss.data.data;
-            isDialogEdit.value = false;
-            totalPage.value = rss.data.count;
-            loading.value = false;
-          }
-          loading.value = false;
-        })
-        .catch((error) => {
-          loading.value = false;
-          console.log(error);
-        });
+      pushNotiSuccess();            
+      isDialogEdit.value = false;
+      fetchUsers()
+
     } else {
       loadingAddUser.value = false;
       isDialogEdit.value = false;
@@ -1321,6 +1311,13 @@ onMounted(() => {
                 </VBtn>
               </VCol>
             </VRow>
+            <VCol cols="12">
+              <VTextField
+                v-model="Edit.phone"
+                label="Số điện thoại"
+                :rules="[requiredValidator]"
+              />
+            </VCol>
             <VCol cols="12">
               <VTextField
                 v-model="Edit.maGioiThieuAdd1"
