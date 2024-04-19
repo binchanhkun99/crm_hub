@@ -719,7 +719,7 @@ onMounted(async () => {
                 <!-- 👉 User -->
                 <td>
                   <div class="d-flex align-center">
-                    {{ (currentPage - 1) * rowPerPage + index + 1 }}                  </div>
+                    {{ currentPage <= 0 ? 0 * rowPerPage + index + 1 : (currentPage - 1) * rowPerPage + index + 1 }}                 </div>
                 </td>
                 <td>
                   <div class="d-flex align-center">
