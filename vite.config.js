@@ -13,7 +13,8 @@ import vuetify from 'vite-plugin-vuetify'
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    historyApiFallback: true
+    historyApiFallback: true,
+    port: 1999
   },
   plugins: [
     vue(),

@@ -131,13 +131,12 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = dataPrompt.value.length
-    ? currentPage.value * rowPerPage.value
+  const firstIndex =  dataPrompt.value.length
+    ? (currentPage.value - 1) * rowPerPage.value + 1
     : 0;
-  const lastIndex =
-    dataPrompt.value.length + currentPage.value * rowPerPage.value;
+  const lastIndex =  currentPage.value * rowPerPage.value;
 
-  return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
+  return `${firstIndex}-${lastIndex} of ${totalPage.value}`;
 });
 
 // SECTION Checkbox toggle

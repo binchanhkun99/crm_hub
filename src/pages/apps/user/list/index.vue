@@ -116,8 +116,6 @@ const roles = ref([
   },
 ]);
 
-
-
 const plans = ref([
   {
     title: "Tất cả",
@@ -165,9 +163,9 @@ const isAddNewUserDrawerVisible = ref(false);
 // 👉 Computing pagination data
 const paginationData = computed(() => {
   const firstIndex = users.value.length
-    ? currentPage.value * rowPerPage.value
+    ? (currentPage.value - 1) * rowPerPage.value + 1
     : 0;
-  const lastIndex = users.value.length + currentPage.value * rowPerPage.value;
+  const lastIndex =  currentPage.value * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalPage.value}`;
 });
