@@ -385,7 +385,7 @@ onMounted(() => {
                     <!-- 👉 Export -->
                     <VBtn color="primary" @click="ExportExcel">
                       <VIcon start icon="bx-cloud-upload" />
-                      Export
+                      Xuất Hoá Đơn
                     </VBtn>
                   </div>
                 </VCardText>
@@ -470,7 +470,7 @@ onMounted(() => {
 
                   <!-- 👉 URL banner -->
                   <td>
-                    <span class="text-capitalize text-base">{{
+                    <span class="text-base">{{
                       user.mail
                     }}</span>
                   </td>

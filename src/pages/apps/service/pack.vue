@@ -528,8 +528,8 @@ onMounted(async () => {
   </section>
   <section v-else>
     <div>
-      <a-modal v-model:open="open" title="Delete Package" @ok="handleOk">
-        <p>Bạn có chắc muốn xoá Package này?</p>
+      <a-modal v-model:open="open" title="Xoá Gói" @ok="handleOk">
+        <p>Bạn có chắc muốn xoá Gói này?</p>
       </a-modal>
     </div>
     <VRow>
@@ -545,7 +545,7 @@ onMounted(async () => {
 
             <div class="d-flex align-center">
               <!-- 👉 Add Pack button -->
-              <VBtn @click="beforAdd"> Add Pack </VBtn>
+              <VBtn @click="beforAdd"> Thêm Gói </VBtn>
             </div>
           </VCardText>
           <VDivider />
@@ -566,13 +566,13 @@ onMounted(async () => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Title</th>
-                <th scope="col">Time of Pack</th>
-                <th scope="col">Time hiệu lực</th>
+                <th scope="col">Tiêu đề</th>
+                <th scope="col">Số ngày</th>
+                <th scope="col">Thời gian hiệu lực</th>
                 <th scope="col">Chi tiết</th>
                 <th scope="col">Giá gói</th>
 
-                <th scope="col">Platform</th>
+                <th scope="col">Nền tảng</th>
                 <th scope="col">ACTIONS</th>
               </tr>
             </thead>
@@ -649,14 +649,14 @@ onMounted(async () => {
                 </td>
                 <td>
                   
-                    <VTextField style="width: 130px;" v-model="user.platform" label="Platform" />
+                    <VTextField style="width: 130px;" v-model="user.platform" />
                 
                 </td>
 
                 <!-- 👉 Actions -->
                 <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
-                    <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
+                  <VBtn color="warning" @click="showEdit(user.id)" style="margin-right: 8px">
+                    <VIcon icon="bxs-edit"  />
                   </VBtn>
                   <VBtn color="error" @click="showModal(user.id)">
                     <VIcon icon="bx-trash" />
@@ -670,7 +670,7 @@ onMounted(async () => {
             <tfoot v-show="!dataPack.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
-                  No data available
+                  Không có dữ liệu
                 </td>
               </tr>
             </tfoot>
@@ -719,7 +719,7 @@ onMounted(async () => {
       max-width="600"
     >
       <!-- Dialog Content -->
-      <VCard title="Add New Package">
+      <VCard title="Thêm gói mới">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -760,7 +760,7 @@ onMounted(async () => {
               <VTextField
                 v-model="Price"
                 :rules="[requiredValidator]"
-                label="Price"
+                label="Giá"
               />
             </VCol>
             <VCol cols="12">
@@ -805,7 +805,7 @@ onMounted(async () => {
                 multiple
                 v-model="Platform"
                 :items="platformLists"
-                label="Platform"
+                label="Nền tảng"
               />
             </VCol>
           </VRow>
@@ -816,9 +816,9 @@ onMounted(async () => {
             variant="tonal"
             @click="isDialogVisible = false"
           >
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="addUser"> Save </VBtn>
+          <VBtn @click="addUser"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -864,7 +864,7 @@ onMounted(async () => {
     <!-- 👉 Edit New Pack -->
     <VDialog persistent v-model="isDialogEdit" max-width="600">
       <!-- Edit Dialog -->
-      <VCard title="Edit Package">
+      <VCard title="Chỉnh sửa gói">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -877,14 +877,14 @@ onMounted(async () => {
               <VTextField
                 v-model="Edit.title"
                 :rules="[requiredValidator]"
-                label="Title"
+                label="Tiêu đề"
               />
             </VCol>
             <VCol cols="12">
               <VTextField
                 v-model="Edit.Description"
                 :rules="[requiredValidator]"
-                label="Description"
+                label="Thông tin chi tiết"
               />
             </VCol>
             <VCol cols="12">
@@ -961,9 +961,9 @@ onMounted(async () => {
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
           <VBtn color="secondary" variant="tonal" @click="isDialogEdit = false">
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="SaveEdit"> Save </VBtn>
+          <VBtn @click="SaveEdit"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

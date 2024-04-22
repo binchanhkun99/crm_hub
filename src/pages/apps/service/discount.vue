@@ -440,7 +440,7 @@ onMounted(() => {
             <div class="d-flex align-center">
               <!-- 👉 Add Discount button -->
               <VBtn @click="isDialogVisible = !isDialogVisible">
-                Add Discount
+                Thêm Discount
               </VBtn>
             </div>
           </VCardText>
@@ -462,10 +462,10 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Discount Name</th>
+                <th scope="col">Tên Discount</th>
                 <th scope="col">Discount Code</th>
-                <th scope="col">Discount Amount</th>
-                <th scope="col">Expiry Date</th>
+                <th scope="col">Giá trị</th>
+                <th scope="col">Thời hạn</th>
                 <th scope="col">ACTIONS</th>
               </tr>
             </thead>
@@ -540,8 +540,8 @@ onMounted(() => {
 
                 <!-- 👉 Actions -->
                 <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
-                    <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
+                  <VBtn @click="showEdit(user.id)" color="warning" style="margin-right: 8px">
+                    <VIcon icon="bxs-edit"  />
                   </VBtn>
                   <VBtn color="error" @click="showModal(user.id)">
                     <VIcon icon="bx-trash" />
@@ -555,7 +555,7 @@ onMounted(() => {
             <tfoot v-show="!discountData.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
-                  No data available
+                Không có dữ liệu
                 </td>
               </tr>
             </tfoot>
@@ -611,7 +611,7 @@ onMounted(() => {
             <VCol cols="12">
               <VTextField
                 v-model="Discount_name"
-                label="Discount Name"
+                label="Tên Discount"
                 :rules="[requiredValidator]"
               />
             </VCol>
@@ -626,7 +626,7 @@ onMounted(() => {
               <VTextField
                 v-model="Discount_amount"
                 :rules="[requiredValidator]"
-                label="Discount Amount"
+                label="Giá trị"
               />
             </VCol>
             <VCol cols="12">
@@ -644,9 +644,9 @@ onMounted(() => {
             variant="tonal"
             @click="isDialogVisible = false"
           >
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="addUser"> Save </VBtn>
+          <VBtn @click="addUser"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -733,9 +733,9 @@ onMounted(() => {
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
           <VBtn color="secondary" variant="tonal" @click="isDialogEdit = false">
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="SaveEdit"> Save </VBtn>
+          <VBtn @click="SaveEdit"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

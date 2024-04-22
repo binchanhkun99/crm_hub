@@ -652,7 +652,7 @@ onMounted(async () => {
             <VCol cols="12" sm="6">
               <VTextField
                 v-model="searchQuery"
-                placeholder="Prompt Name"
+                placeholder="Tên Prompt"
                 density="compact"
                 class="me-3"
               />
@@ -669,7 +669,7 @@ onMounted(async () => {
 
             <div class="d-flex align-center">
               <!-- 👉 Add Prompt button -->
-              <VBtn @click="beforAdd"> Add Prompt </VBtn>
+              <VBtn @click="beforAdd"> Thêm Prompt </VBtn>
             </div>
           </VCardText>
           <VDivider />
@@ -690,7 +690,7 @@ onMounted(async () => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Prompt Name</th>
+                <th scope="col">Tên Prompt</th>
                 <th scope="col">Mô tả</th>
                 <th scope="col">Chat</th>
                 <th scope="col">Chủ đề</th>
@@ -834,7 +834,7 @@ onMounted(async () => {
     <!-- 👉 Add New Prompt -->
     <VDialog v-model="isDialogVisible" persistent max-width="600">
       <!-- Dialog Content -->
-      <VCard title="Add New Prompt">
+      <VCard title="Thêm mới Prompt">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -866,7 +866,7 @@ onMounted(async () => {
             <VCol cols="12">
               <VTextField
                 v-model="_promtName"
-                label="Prompt Name"
+                label="Tên Prompt"
                 :rules="[requiredValidator]"
             /></VCol>
             <VCol cols="12">
@@ -933,7 +933,7 @@ onMounted(async () => {
                 </a-space>
                 <a-button type="dashed" block @click="addInput(inputTypeVal)">
                   <PlusOutlined />
-                  Add Input
+                  Thêm Input
                 </a-button>
               </div>
 
@@ -974,9 +974,9 @@ onMounted(async () => {
             variant="tonal"
             @click="isDialogVisible = false"
           >
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="saveForm"> Save </VBtn>
+          <VBtn @click="saveForm"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -1022,7 +1022,7 @@ onMounted(async () => {
     <!-- 👉 Edit New Prompt -->
     <VDialog v-model="isDialogEdit" persistent max-width="600">
       <!-- Dialog Content -->
-      <VCard title="Edit Prompt">
+      <VCard title="Chỉnh sửa Prompt">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -1054,7 +1054,7 @@ onMounted(async () => {
             <VCol cols="12">
               <VTextField
                 v-model="Edit.promptName"
-                label="Prompt Name"
+                label="Tên Prompt"
                 :rules="[requiredValidator]"
             /></VCol>
             <VCol cols="12">
@@ -1139,7 +1139,7 @@ onMounted(async () => {
                 </a-space>
                 <a-button type="dashed" block @click="addInputEdit">
                   <PlusOutlined />
-                  Add Input
+                 Thêm Input
                 </a-button>
               </div>
             </VCol>
@@ -1147,9 +1147,9 @@ onMounted(async () => {
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
           <VBtn color="secondary" variant="tonal" @click="isDialogEdit = false">
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="SaveEdit()"> Save </VBtn>
+          <VBtn @click="SaveEdit()"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

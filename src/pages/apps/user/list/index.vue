@@ -674,12 +674,12 @@ onMounted(() => {
   </section>
   <section v-else>
     <div>
-      <a-modal v-model:open="open" title="Delete User" @ok="handleOk">
+      <a-modal v-model:open="open" title="Xoá người dùng" @ok="handleOk">
         <p>Bạn có chắc muốn xoá User này?</p>
       </a-modal>
     </div>
     <div>
-      <a-modal v-model:open="openDeleteSv" title="Delete Gói" @ok="DeletePack">
+      <a-modal v-model:open="openDeleteSv" title="Xoá Gói" @ok="DeletePack">
         <p>Bạn có chắc muốn xoá gói dịch vụ cho User này?</p>
       </a-modal>
     </div>
@@ -718,7 +718,7 @@ onMounted(() => {
               <VCol cols="12" sm="2">
                 <VTextField
                   v-model="searchQuery"
-                  placeholder="Email or Username"
+                  placeholder="Email hoặc tên người dùng"
                   density="compact"
                   class="me-3"
                 />
@@ -753,7 +753,7 @@ onMounted(() => {
             <div class="d-flex align-center">
               <!-- 👉 Add user button -->
               <VBtn @click="isDialogVisible = !isDialogVisible">
-                Add User
+                Thêm User
               </VBtn>
             </div>
           </VCardText>
@@ -775,7 +775,7 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">User Name</th>
+                <th scope="col">Tên người dùng</th>
                 <th scope="col">Email</th>
                 <th scope="col">Quốc Gia</th>
                 <th scope="col">SĐT</th>
@@ -828,7 +828,7 @@ onMounted(() => {
                 </td>
                 <!-- 👉 Email -->
                 <td>
-                  <span class="text-capitalize text-base">{{ user.mail }}</span>
+                  <span class="text-base">{{ user.mail }}</span>
                 </td>
                 <!-- 👉 Country -->
                 <td>
@@ -945,7 +945,7 @@ onMounted(() => {
             <tfoot v-show="!users.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
-                  No data available
+                 Không có data
                 </td>
               </tr>
             </tfoot>
@@ -993,7 +993,7 @@ onMounted(() => {
       style="z-index: 2000"
     >
       <!-- Dialog Content -->
-      <VCard title="Add gói mới">
+      <VCard title="Thêm gói mới">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -1030,9 +1030,9 @@ onMounted(() => {
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
           <VBtn color="secondary" variant="tonal" @click="isNewService = false">
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="addNewServiceForUser"> Save </VBtn>
+          <VBtn @click="addNewServiceForUser"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -1044,7 +1044,7 @@ onMounted(() => {
       style="z-index: 2000"
     >
       <!-- Dialog Content -->
-      <VCard title="Edit Dịch vụ">
+      <VCard title="Chỉnh sửa Dịch vụ">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -1090,9 +1090,9 @@ onMounted(() => {
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
           <VBtn color="secondary" variant="tonal" @click="isEditPack = false">
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="EditServiceForUser"> Save </VBtn>
+          <VBtn @click="EditServiceForUser"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -1112,7 +1112,7 @@ onMounted(() => {
             <VCol cols="12">
               <VTextField
                 v-model="userName"
-                label="Username"
+                label="Tên người dùng"
                 :rules="[requiredValidator]"
               />
             </VCol>
@@ -1174,9 +1174,9 @@ onMounted(() => {
             variant="tonal"
             @click="isDialogVisible = false"
           >
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="addUser"> Save </VBtn>
+          <VBtn @click="addUser"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -1223,7 +1223,7 @@ onMounted(() => {
     <!-- 👉 Edit New User -->
     <VDialog persistent v-model="isDialogEdit" max-width="600">
       <!-- Edit Dialog -->
-      <VCard title="Edit User">
+      <VCard title="Chỉnh sửa User">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -1236,7 +1236,7 @@ onMounted(() => {
               <VTextField
                 v-model="Edit.userName1"
                 :rules="[requiredValidator]"
-                label="Username"
+                label="Tên người dùng"
               />
             </VCol>
             <VCol cols="12">
@@ -1327,9 +1327,9 @@ onMounted(() => {
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
           <VBtn color="secondary" variant="tonal" @click="isDialogEdit = false">
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="SaveEdit"> Save </VBtn>
+          <VBtn @click="SaveEdit"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>

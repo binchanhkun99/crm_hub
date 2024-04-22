@@ -352,7 +352,7 @@ onMounted(() => {
 
             <div class="d-flex align-center">
               <!-- 👉 Add user button -->
-              <VBtn @click="isDialogVisible = !isDialogVisible"> Add GPT </VBtn>
+              <VBtn @click="isDialogVisible = !isDialogVisible"> Thêm GPT </VBtn>
             </div>
           </VCardText>
           <VDivider />
@@ -373,10 +373,10 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Title</th>
+                <th scope="col">Tiêu đề</th>
                 <th scope="col">API Key</th>
                 <th scope="col">Count</th>
-                <th scope="col">Status</th>
+                <th scope="col">Trạng thái</th>
                 <th scope="col">Ngày tạo</th>
                 <th scope="col">ACTIONS</th>
               </tr>
@@ -459,8 +459,8 @@ onMounted(() => {
 
                 <!-- 👉 Actions -->
                 <td class="text-center" style="width: 80px">
-                  <VBtn color="warning" style="margin-right: 8px">
-                    <VIcon icon="bxs-edit" @click="showEdit(user.id)" />
+                  <VBtn color="warning" @click="showEdit(user.id)" style="margin-right: 8px">
+                    <VIcon icon="bxs-edit"  />
                   </VBtn>
                   <VBtn color="error" @click="showModal(user.id)">
                     <VIcon icon="bx-trash" />
@@ -474,7 +474,7 @@ onMounted(() => {
             <tfoot v-show="!gptData.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
-                  No data available
+                  Không có data
                 </td>
               </tr>
             </tfoot>
@@ -519,7 +519,7 @@ onMounted(() => {
     <!-- 👉 Add New User -->
     <VDialog v-model="isDialogVisible" max-width="600">
       <!-- Dialog Content -->
-      <VCard title="Add New GPT">
+      <VCard title="Thêm mới Key GPT">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -531,7 +531,7 @@ onMounted(() => {
             <VCol cols="12">
               <VTextField
                 v-model="title"
-                label="Title"
+                label="Tiêu đề"
                 :rules="[requiredValidator]"
               />
             </VCol>
@@ -550,9 +550,9 @@ onMounted(() => {
             variant="tonal"
             @click="isDialogVisible = false"
           >
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="addUser"> Save </VBtn>
+          <VBtn @click="addUser"> Lưu </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -612,7 +612,7 @@ onMounted(() => {
               <VTextField
                 v-model="Edit.title"
                 :rules="[requiredValidator]"
-                label="Title"
+                label="Tiêu đề"
               />
             </VCol>
             <VCol cols="12">
@@ -626,9 +626,9 @@ onMounted(() => {
         </VCardText>
         <VCardText class="d-flex justify-end gap-2">
           <VBtn color="secondary" variant="tonal" @click="isDialogEdit = false">
-            Close
+            Đóng
           </VBtn>
-          <VBtn @click="SaveEdit"> Save</VBtn>
+          <VBtn @click="SaveEdit"> Lưu</VBtn>
         </VCardText>
       </VCard>
     </VDialog>
