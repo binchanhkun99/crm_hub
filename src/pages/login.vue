@@ -93,10 +93,10 @@ const onSubmit = () => {
 
         <VCardText>
           <h6 class="text-h6 mb-1">
-            Welcome to {{ themeConfig.app.title }}! 👋🏻
+            Chào mừng bạn đến với {{ themeConfig.app.title }}! 👋🏻
           </h6>
           <p class="mb-0">
-            Please sign-in to your account and start the adventure
+           Vui lòng đăng nhập để sử dụng CRM
           </p>
         </VCardText>
 
@@ -108,7 +108,7 @@ const onSubmit = () => {
                 <VTextField
                   v-model="form.email"
                   autofocus
-                  label="Email or Username"
+                  label="Email hoặc tên người dùng"
 
                   :rules="[requiredValidator]"
                   type="text"
@@ -119,7 +119,7 @@ const onSubmit = () => {
               <VCol cols="12">
                 <VTextField
                   v-model="form.password"
-                  label="Password"
+                  label="Mật khẩu"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :rules="[requiredValidator]"
                   :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
@@ -130,7 +130,7 @@ const onSubmit = () => {
                 <div
                   class="d-flex align-center justify-space-between flex-wrap mt-2 mb-4"
                 >
-                  <VCheckbox v-model="form.remember" label="Remember me" />
+                  <!-- <VCheckbox v-model="form.remember" label="Remember me" /> -->
 
                   <!-- <RouterLink
                     class="text-primary text-sm ms-2"
@@ -141,7 +141,7 @@ const onSubmit = () => {
                 </div>
 
                 <!-- login button -->
-                <VBtn block type="submit"> Login </VBtn>
+                <VBtn block type="submit"> Đăng nhập </VBtn>
               </VCol>
 
               <!-- create account -->
