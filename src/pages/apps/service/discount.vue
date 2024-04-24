@@ -429,7 +429,7 @@ onMounted(() => {
    
 
       <VCol cols="12">
-        <VCard title="Quản lý Discount">
+        <VCard title="Quản lý mã khuyến mãi">
           <VDivider />
 
           <VCardText class="d-flex flex-wrap gap-4">
@@ -440,7 +440,7 @@ onMounted(() => {
             <div class="d-flex align-center">
               <!-- 👉 Add Discount button -->
               <VBtn @click="isDialogVisible = !isDialogVisible">
-                Thêm Discount
+                Thêm Mã khuyến mãi
               </VBtn>
             </div>
           </VCardText>
@@ -466,7 +466,7 @@ onMounted(() => {
                 <th scope="col">Discount Code</th>
                 <th scope="col">Giá trị</th>
                 <th scope="col">Thời hạn</th>
-                <th scope="col">ACTIONS</th>
+                <th scope="col">Hành động</th>
               </tr>
             </thead>
 
@@ -565,8 +565,8 @@ onMounted(() => {
           <!-- SECTION Pagination -->
           <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
             <!-- 👉 Rows per page -->
-            <div class="d-flex align-center" style="width: 171px">
-              <span class="text-no-wrap text-sm me-3">Rows per page:</span>
+            <div class="d-flex align-center" style="width: 200px">
+              <span class="text-no-wrap text-sm me-3">Dòng trên mỗi trang:</span>
               <VSelect
                 v-model="rowPerPage"
                 density="compact"
@@ -599,7 +599,7 @@ onMounted(() => {
     <!-- 👉 Add New Discount -->
     <VDialog persistent v-model="isDialogVisible" max-width="600">
       <!-- Dialog Content -->
-      <VCard title="Add New Discount">
+      <VCard title="Thêm mới mã khuyến mãi">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -611,7 +611,7 @@ onMounted(() => {
             <VCol cols="12">
               <VTextField
                 v-model="Discount_name"
-                label="Tên Discount"
+                label="Tên mã khuyến mãi"
                 :rules="[requiredValidator]"
               />
             </VCol>
@@ -619,7 +619,7 @@ onMounted(() => {
               <VTextField
                 v-model="Discount_code"
                 :rules="[requiredValidator]"
-                label="Discount Code"
+                label="Mã khuyến mãi"
               />
             </VCol>
             <VCol cols="12">

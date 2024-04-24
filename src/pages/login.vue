@@ -158,11 +158,6 @@ const onSubmit = () => {
                 </RouterLink>
               </VCol> -->
 
-              <VCol cols="12" class="d-flex align-center">
-                <VDivider />
-                <span class="mx-4">or</span>
-                <VDivider />
-              </VCol>
 
               <!-- auth providers -->
               <VCol cols="12" class="text-center">

@@ -53,6 +53,9 @@ const fetchUsers = async () => {
   // selectedRole.value = "";
   selectedPlan.value = "all";
 };
+watch(rowPerPage, (newVal, oldVal) => {
+  fetchUsers();
+});
 // 👉 Fetching users
 const fetchUsersPag = async (page) => {
   loading.value = true;
@@ -956,8 +959,8 @@ onMounted(() => {
           <!-- SECTION Pagination -->
           <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
             <!-- 👉 Rows per page -->
-            <div class="d-flex align-center" style="width: 171px">
-              <span class="text-no-wrap text-sm me-3">Rows per page:</span>
+            <div class="d-flex align-center" style="width: 200px">
+              <span class="text-no-wrap text-sm me-3">Dòng trên mỗi trang:</span>
               <VSelect
                 v-model="rowPerPage"
                 density="compact"

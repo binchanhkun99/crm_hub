@@ -272,12 +272,12 @@ const autoScroll = () => {
   <section v-if="role == 0 || role == 1">
     <div>
       <a-modal v-model:open="open" title="Đóng Ticket" @ok="handleOk">
-        <p>Bạn có chắc đóng Ticket này?</p>
+        <p>Bạn có chắc đóng yêu cầu này này?</p>
       </a-modal>
     </div>
     <VTabs v-model="currentTab" class="v-tabs-pill">
-      <VTab style="width: 125px" value="one">Tickets Open</VTab>
-      <VTab style="width: 120px" value="two">My Ticket</VTab>
+      <VTab style="width: 152px" value="one">Tickets đang mở </VTab>
+      <VTab style="width: 130px" value="two">Ticket của tôi</VTab>
       <VTab style="width: 125px" value="three">Tất cả Ticket</VTab>
     </VTabs>
 
@@ -299,7 +299,7 @@ const autoScroll = () => {
             <div v-if="!detailTicketData">
               <a-result
                 status="403"
-                title="Open Ticket"
+                title="Mở Ticket"
                 sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng"
               ></a-result>
             </div>
@@ -368,7 +368,7 @@ const autoScroll = () => {
             <div v-if="!detailTicketData">
               <a-result
                 status="403"
-                title="Open Ticket"
+                title="Mở Ticket"
                 sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng"
               >
               </a-result>
@@ -439,7 +439,7 @@ const autoScroll = () => {
             <div v-if="!detailTicketData">
               <a-result
                 status="403"
-                title="Open Ticket"
+                title="Mở Ticket"
                 sub-title="Hãy mở bất kỳ ticket nào có sẵn để bắt đầu hỗ trợ khách hàng"
               >
               </a-result>
