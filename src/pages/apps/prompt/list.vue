@@ -698,7 +698,7 @@ onMounted(async () => {
                 <th scope="col">Lượt thích</th>
                 <th scope="col">typeAI</th>
                 <th scope="col">Trạng thái</th>
-                <th scope="col">ACTIONS</th>
+                <th scope="col">Hành động</th>
               </tr>
             </thead>
 

@@ -573,7 +573,7 @@ onMounted(async () => {
                 <th scope="col">Giá gói</th>
 
                 <th scope="col">Nền tảng</th>
-                <th scope="col">ACTIONS</th>
+                <th scope="col">Hành động</th>
               </tr>
             </thead>
 

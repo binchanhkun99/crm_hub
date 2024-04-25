@@ -462,8 +462,8 @@ onMounted(() => {
                   />
                 </th> -->
                 <th scope="col">STT</th>
-                <th scope="col">Tên Discount</th>
-                <th scope="col">Discount Code</th>
+                <th scope="col">Tên Mã khuyến mãi</th>
+                <th scope="col">Mã khuyến mãi</th>
                 <th scope="col">Giá trị</th>
                 <th scope="col">Thời hạn</th>
                 <th scope="col">Hành động</th>

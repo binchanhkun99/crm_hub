@@ -787,7 +787,7 @@ onMounted(() => {
                 <th scope="col">Gói Đăng Ký</th>
                 <th scope="col">Quyền</th>
                 <th scope="col">Mã Giới Thiệu</th>
-                <th scope="col" v-if="role == 0">ACTIONS</th>
+                <th scope="col" v-if="role == 0">Hành động</th>
               </tr>
             </thead>
 

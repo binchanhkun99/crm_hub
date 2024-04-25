@@ -431,7 +431,7 @@ onMounted(() => {
                 <th scope="col">STT</th>
                 <th scope="col">Chủ đề</th>
 
-                <th scope="col">ACTIONS</th>
+                <th scope="col">Hành động</th>
               </tr>
             </thead>
 

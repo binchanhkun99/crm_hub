@@ -378,7 +378,7 @@ onMounted(() => {
                 <th scope="col">Count</th>
                 <th scope="col">Trạng thái</th>
                 <th scope="col">Ngày tạo</th>
-                <th scope="col">ACTIONS</th>
+                <th scope="col">Hành động</th>
               </tr>
             </thead>
 
