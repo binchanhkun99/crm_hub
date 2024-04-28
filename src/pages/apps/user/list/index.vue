@@ -756,7 +756,7 @@ onMounted(() => {
             <div class="d-flex align-center">
               <!-- 👉 Add user button -->
               <VBtn @click="isDialogVisible = !isDialogVisible">
-                Thêm User
+                Thêm người dùng
               </VBtn>
             </div>
           </VCardText>
