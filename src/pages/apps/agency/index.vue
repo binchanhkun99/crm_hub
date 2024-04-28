@@ -7,7 +7,7 @@ const selectedRole = ref();
 const selectedPlan = ref();
 const selectedStatus = ref();
 const rowPerPage = ref(10);
-const currentPage = ref(0);
+const currentPage = ref(1);
 const totalPage = ref(10);
 const totalUsers = ref(0);
 const chuDeList = ref([]);
@@ -24,7 +24,7 @@ const pageMgt = ref(0);
 const rowPerPageMgt = ref(10);
 const users = ref([]);
 const totalPageMgt = ref(10);
-const currentPageMgt = ref(0);
+const currentPageMgt = ref(1);
 const mgtListVal = ref();
 const pageSizeMgt = ref();
 
@@ -32,14 +32,15 @@ page.value = currentPage.value;
 // 👉 Fetching chuDeList
 // const reduce = ref()
 const ListChuDe = ref([]);
-const dataAgency = ref();
+const dataAgency = ref([]);
 const fetchAgency = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
+  const offset = page.value -1
   await request
     .get(
-      `api/admin/index.php?key=${apiKey.value}&action=list_all_agencies&page=${page.value}`
+      `api/admin/index.php?key=${apiKey.value}&action=list_all_agencies&page=${offset}`
     )
     .then((rss) => {
       if (rss.data.status) {
@@ -107,8 +108,8 @@ const fetchUserbyMgt = async (page) => {
         isListMagioiThieu.value = true;
         users.value = rss.data.data;
 
-        totalPage.value = rss.data.count;
-        pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
+        totalPageMgt.value = rss.data.count;
+        pageSizeMgt.value = Math.ceil(totalPageMgt.value / rowPerPageMgt.value);
         loadingAddUser.value = false;
       }
       loadingAddUser.value = false;
@@ -118,17 +119,16 @@ const fetchUserbyMgt = async (page) => {
       console.log(error);
     });
 };
-
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = chuDeList.value.length
-    ? currentPage.value * rowPerPage.value
+  const firstIndex = users.value.length
+    ? (currentPage.value - 1) * rowPerPage.value + 1
     : 0;
-  const lastIndex =
-    chuDeList.value.length + currentPage.value * rowPerPage.value;
+  const lastIndex =  currentPage.value * rowPerPage.value;
 
-  return `${firstIndex}-${lastIndex} of ${totalUsers.value}`;
+  return `${firstIndex}-${lastIndex} of ${totalPage.value}`;
 });
+
 
 // 👉 Delete GPT
 const open = ref(false);
@@ -286,10 +286,11 @@ const isListMagioiThieu = ref(false);
 // 👉 Computing pagination data
 const paginationDataMgt = computed(() => {
   const firstIndex = users.value.length
-    ? currentPageMgt.value * rowPerPageMgt.value
+    ? (currentPageMgt.value -1) * rowPerPageMgt.value+1
     : 0;
+   
   const lastIndex =
-    users.value.length + currentPageMgt.value * rowPerPageMgt.value;
+   currentPageMgt.value * rowPerPageMgt.value;
 
   return `${firstIndex}-${lastIndex} of ${totalPageMgt.value}`;
 });
@@ -401,7 +402,7 @@ onMounted(() => {
                 <th scope="col">Mã giới thiệu</th>
                 <th scope="col">Giá</th>
                 <th scope="col">Ghi chú</th>
-                <th scope="col" v-if="role == 0 || role == 1">ACTIONS</th>
+                <th scope="col" v-if="role == 0 || role == 1">Hành động</th>
               </tr>
             </thead>
 
@@ -410,7 +411,7 @@ onMounted(() => {
               <tr v-for="(user, index) in dataAgency" :key="index">
                 <td>
                   <div class="d-flex align-center">
-                    {{ index + 1 }}
+                    {{ currentPage <= 0 ? 0 * rowPerPage + index + 1 : (currentPage - 1) * rowPerPage + index + 1 }}
                   </div>
                 </td>
                 <td>
@@ -483,7 +484,7 @@ onMounted(() => {
             </tbody>
 
             <!-- 👉 table footer  -->
-            <tfoot v-show="!ListChuDe.length">
+            <tfoot v-show="!dataAgency.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
                   No data available
@@ -622,7 +623,7 @@ onMounted(() => {
     <VDialog v-model="isListMagioiThieu" max-width="800">
       <VRow>
         <VCol cols="12">
-          <VCard title="Danh sách User theo mã giới thiệu">
+          <VCard title="Danh sách người dùng theo mã giới thiệu">
             <VDivider />
 
             <VCardText class="d-flex flex-wrap gap-4">
@@ -636,7 +637,8 @@ onMounted(() => {
             </VCardText>
             <VDivider />
             <VProgressLinear v-if="loading" indeterminate color="primary" />
-            <VTable class="text-no-wrap">
+            <VTable class="text-no-wrap" style="overflow-y: auto;
+    max-height: 400px;">
               <!-- 👉 table head -->
               <thead>
                 <tr>
@@ -663,7 +665,8 @@ onMounted(() => {
                 <tr v-for="(user, index) in users" :key="index">
                   <td>
                     <div class="d-flex align-center">
-                      {{ index + 1 }}
+                      {{ currentPageMgt <= 0 ? 0 * rowPerPageMgt + index + 1 : (currentPageMgt - 1) * rowPerPageMgt + index + 1 }}
+
                     </div>
                   </td>
                   <td>

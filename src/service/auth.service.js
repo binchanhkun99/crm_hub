@@ -23,6 +23,9 @@ class AuthService {
         alert("Bạn không có quyền này!!!");
         return;
       }
+      if(data.status == 'error'){
+        return data.status
+      }
     } catch (e) {
       console.log(e);
       throw new Error(e);

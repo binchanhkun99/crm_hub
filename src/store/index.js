@@ -16,7 +16,7 @@ const store = createStore({
       try {
         const userDB = await AuthService.login(user);
         commit("loginSuccess", user);
-        return Promise.resolve(user);
+        return Promise.resolve(userDB);
       } catch (error) {
         commit("loginFailure");
         return Promise.reject(error);

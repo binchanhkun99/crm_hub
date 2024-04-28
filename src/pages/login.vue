@@ -2,9 +2,7 @@
 import store from "@/store";
 import { VNodeRenderer } from "@layouts/components/VNodeRenderer";
 import { themeConfig } from "@themeConfig";
-import {
-requiredValidator
-} from "@validators";
+import { requiredValidator } from "@validators";
 import { useRouter } from "vue-router";
 import { VForm } from "vuetify/components/VForm";
 const router = useRouter();
@@ -18,7 +16,7 @@ const loading = ref(false);
 const successStatus = ref(false);
 const errorStatus = ref(false);
 const isPasswordVisible = ref(false);
-
+const loadingEdit = ref(false);
 //Vuex
 const loggedIn = computed(() => store.getters.usersss);
 if (loggedIn.value) {
@@ -26,40 +24,55 @@ if (loggedIn.value) {
 }
 
 const handleLogin = () => {
+  loadingEdit.value = true;
   const user = {
     email: form.value.email,
     password: form.value.password,
   };
-  loading.value = true;
   store
     .dispatch("login", user)
-    .then(() => {
-      loading.value = false;
+    .then((res) => {
+      loadingEdit.value = false;
       successStatus.value = true;
       router.push("/");
+      if (res == "error") {pushNotiError();}
+      else{
+        pushNotiSuccess()
+      }
     })
     .catch((error) => {
-      console.log(error)
-      loading.value = false;
+      loadingEdit.value = false;
+      console.log(error);
+
       errorStatus.value = true;
-
-      setTimeout(() => {
-        errorStatus.value = false;
-      }, 3000);
-
     });
 };
 const refVForm = ref();
 const onSubmit = () => {
- refVForm.value?.validate().then(({ valid: isValid }) => {
-    if (isValid) handleLogin()
-    else{
-        errorStatus.value = true
-        lido.value = "Invalid field"
-      setTimeout(()=>{
-        errorStatus.value = false
-      }, 3000)}
+  refVForm.value?.validate().then(({ valid: isValid }) => {
+    if (isValid) handleLogin();
+    else {
+      errorStatus.value = true;
+      lido.value = "Invalid field";
+      setTimeout(() => {
+        errorStatus.value = false;
+      }, 3000);
+    }
   });
+};
+const notiSuccess = ref(false);
+const notiError = ref(false);
+const pushNotiSuccess = () => {
+  notiSuccess.value = true;
+  setTimeout(() => {
+    notiSuccess.value = false;
+  }, 2000);
+};
+const pushNotiError = () => {
+  notiError.value = true;
+  setTimeout(() => {
+    notiError.value = false;
+  }, 2000);
 };
 </script>
 
@@ -95,9 +108,7 @@ const onSubmit = () => {
           <h6 class="text-h6 mb-1">
             Chào mừng bạn đến với {{ themeConfig.app.title }}! 👋🏻
           </h6>
-          <p class="mb-0">
-           Vui lòng đăng nhập để sử dụng CRM
-          </p>
+          <p class="mb-0">Vui lòng đăng nhập để sử dụng CRM</p>
         </VCardText>
 
         <VCardText>
@@ -109,7 +120,6 @@ const onSubmit = () => {
                   v-model="form.email"
                   autofocus
                   label="Email hoặc tên người dùng"
-
                   :rules="[requiredValidator]"
                   type="text"
                 />
@@ -158,7 +168,6 @@ const onSubmit = () => {
                 </RouterLink>
               </VCol> -->
 
-
               <!-- auth providers -->
               <VCol cols="12" class="text-center">
                 <!-- <AuthProvider /> -->
@@ -169,6 +178,32 @@ const onSubmit = () => {
       </VCard>
     </div>
   </div>
+  <!-- Dialog loading data edit-->
+  <VDialog v-model="loadingEdit" width="300">
+    <VCard color="primary" width="300">
+      <VCardText class="pt-3">
+        Đang đăng nhập ...
+        <VProgressLinear indeterminate class="mb-0" />
+      </VCardText>
+    </VCard>
+  </VDialog>
+  <!-- Error-->
+  <VDialog v-model="notiError" width="300">
+    <VCard color="primary" width="300">
+      <VAlert type="error">
+        <strong>Đã có lỗi xẩy ra vui lòng thử lại</strong>
+      </VAlert>
+    </VCard>
+  </VDialog>
+      <!-- Success-->
+      <VDialog v-model="notiSuccess" width="300">
+      <VCard color="primary" width="300">
+        <VAlert type="success">
+          <strong>Thành công</strong>
+        </VAlert>
+      </VCard>
+    </VDialog>
+
 </template>
 
 <style lang="scss">
