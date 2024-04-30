@@ -875,11 +875,11 @@ onMounted(() => {
                 <!-- 👉 Phone -->
                 <td>
                   <span class="text-capitalize text-base">{{
-                    user.phone.toString() !== ""
+                    user.phone ? user.phone.toString() !== ""
                       ? user.phone.toString().charAt(0) !== "0"
                         ? "0" + user.phone.toString()
                         : user.phone.toString()
-                      : ""
+                      : "" : user.phone
                   }}</span>
                 </td>
 
