@@ -18,8 +18,10 @@ const loading = ref(false);
 const apiKey = ref();
 const page = ref(1);
 const show1 = ref(false);
-
+const phone = ref();
+const country = ref();
 const isDialogVisible = ref(false);
+const lstCountry = ref([]);
 
 const pageSize = ref(0);
 
@@ -28,7 +30,7 @@ page.value = currentPage.value;
 const fetchUsers = async () => {
   // console.log("selectedRole.value______>", selectedRole.value);
   loading.value = true;
-  let offset = (page.value - 1);
+  let offset = page.value - 1;
 
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
@@ -56,10 +58,11 @@ const fetchUsers = async () => {
 watch(rowPerPage, (newVal, oldVal) => {
   fetchUsers();
 });
+const showPhone = ref();
 // 👉 Fetching users
 const fetchUsersPag = async (page) => {
   loading.value = true;
-  let offset = (page - 1);
+  let offset = page - 1;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
   await request
@@ -69,6 +72,14 @@ const fetchUsersPag = async (page) => {
     .then((rss) => {
       if (rss.data.success) {
         users.value = rss.data.data;
+
+        // if(users.value.phone){
+        //  let sdtShow =  users.value.phone.toString()
+        //   showPhone.value = sdtShow.charAt(0) !== "0" ? "0" + sdtShow : sdtShow;
+        // }
+        // else{
+        //   showPhone.value = ''
+        // }
         totalPage.value = rss.data.count;
         pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
         loading.value = false;
@@ -168,7 +179,7 @@ const paginationData = computed(() => {
   const firstIndex = users.value.length
     ? (currentPage.value - 1) * rowPerPage.value + 1
     : 0;
-  const lastIndex =  currentPage.value * rowPerPage.value;
+  const lastIndex = currentPage.value * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalPage.value}`;
 });
@@ -291,7 +302,7 @@ const Edit = ref({
   ngayHetHan1: "",
   goiDangKy1: "",
   AgencyMGT: "",
-  phone:""
+  phone: "",
 });
 function resetEditValues() {
   Edit.value.email1 = "";
@@ -302,6 +313,7 @@ function resetEditValues() {
   Edit.value.ngayHetHan1 = "";
   Edit.value.goiDangKy1 = "";
   Edit.value.phone = "";
+  Edit.value.country = "";
   selectedQuyen.value = "";
 }
 const reduce = ref();
@@ -341,14 +353,16 @@ const showEdit = async (id) => {
     if (res.data.status) {
       const data = res.data.data;
 
-      console.log(data.user);
       Edit.value.email1 = data.user.mail;
       Edit.value.userName1 = data.user.user;
       Edit.value.password1 = "";
       Edit.value.maGioiThieuAdd1 = data.user.maGioiThieu;
       Edit.value.ngayDangKy1 = data.user.thoiGianDangKy;
       Edit.value.ngayHetHan1 = data.user.thoiGianHetHan;
-      Edit.value.phone = data.user.phone;
+      let sdt = data.user.phone.toString(); // Chuyển đổi số thành chuỗi
+      Edit.value.phone = sdt.charAt(0) !== "0" ? "0" + sdt : sdt;
+
+      Edit.value.country = data.user.country;
       selectedQuyen.value = data.user.level;
       AgencyMGT.value = data.user.acency?.maGioiThieu;
       Edit.value.goiDangKy1 = data.service || "Chưa đăng ký dịch vụ nào";
@@ -357,6 +371,7 @@ const showEdit = async (id) => {
     }
     loadingEdit.value = false;
   } catch (error) {
+    console.log(error);
     loadingEdit.value = false;
   }
 };
@@ -390,7 +405,8 @@ const SaveEdit = async () => {
         level: selectedQuyen.value,
         pass: Edit.value.password1,
         maGioiThieu: Edit.value.maGioiThieuAdd1,
-        phone: Edit.value.phone
+        phone: Edit.value.phone,
+        country: Edit.value.country,
         // user: Edit.value.ngayHetHan1,
         // user: Edit.value.ngayDangKy1,
       },
@@ -401,10 +417,9 @@ const SaveEdit = async () => {
     );
     if (res.data.data == 1) {
       loadingAddUser.value = false;
-      pushNotiSuccess();            
+      pushNotiSuccess();
       isDialogEdit.value = false;
-      fetchUsers()
-
+      fetchUsers();
     } else {
       loadingAddUser.value = false;
       isDialogEdit.value = false;
@@ -484,7 +499,6 @@ const EditService = async (id) => {
   idUsEditService.value = id;
   getUserById(idUsEditService.value);
   getListServiceEdit();
-
 };
 const EditPackID = ref();
 const EditPackprice = ref();
@@ -658,10 +672,24 @@ const addTime = async () => {
 };
 // 👉 OnMounted
 const role = ref(0);
+const loadCountry = async () => {
+  if (lstCountry.value.length == 0) {
+    const pere = await fetch("https://restcountries.com/v3.1/all");
+    let res = await pere.json();
+    for (const iterator of res) {
+      lstCountry.value.push({
+        name: iterator.name.common,
+        cca2: iterator.cca2,
+        cca3: iterator.cca3,
+      });
+    }
+  }
+};
 onMounted(() => {
   const dataRole = JSON.parse(localStorage.getItem("user")) || {};
   role.value = dataRole.level;
   fetchUsers();
+  loadCountry();
 });
 </script>
 
@@ -797,7 +825,11 @@ onMounted(() => {
                 <!-- 👉 User -->
                 <td>
                   <div class="d-flex align-center">
-                    {{ currentPage <= 0 ? 0 * rowPerPage + index + 1 : (currentPage - 1) * rowPerPage + index + 1 }}
+                    {{
+                      currentPage <= 0
+                        ? 0 * rowPerPage + index + 1
+                        : (currentPage - 1) * rowPerPage + index + 1
+                    }}
                   </div>
                 </td>
                 <td>
@@ -843,7 +875,11 @@ onMounted(() => {
                 <!-- 👉 Phone -->
                 <td>
                   <span class="text-capitalize text-base">{{
-                    user.phone
+                    user.phone.toString() !== ""
+                      ? user.phone.toString().charAt(0) !== "0"
+                        ? "0" + user.phone.toString()
+                        : user.phone.toString()
+                      : ""
                   }}</span>
                 </td>
 
@@ -948,7 +984,7 @@ onMounted(() => {
             <tfoot v-show="!users.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">
-                 Không có data
+                  Không có data
                 </td>
               </tr>
             </tfoot>
@@ -960,7 +996,9 @@ onMounted(() => {
           <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
             <!-- 👉 Rows per page -->
             <div class="d-flex align-center" style="width: 200px">
-              <span class="text-no-wrap text-sm me-3">Dòng trên mỗi trang:</span>
+              <span class="text-no-wrap text-sm me-3"
+                >Dòng trên mỗi trang:</span
+              >
               <VSelect
                 v-model="rowPerPage"
                 density="compact"
@@ -1103,7 +1141,7 @@ onMounted(() => {
     <!-- 👉 Add New User -->
     <VDialog v-model="isDialogVisible" max-width="600">
       <!-- Dialog Content -->
-      <VCard title="Add User">
+      <VCard title="Thêm người dùng">
         <DialogCloseBtn
           variant="text"
           size="small"
@@ -1137,6 +1175,21 @@ onMounted(() => {
                 hint="At least 8 characters"
                 counter
                 @click:append-inner="show1 = !show1"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VTextField
+                v-model="phone"
+                label="Số điện thoại"
+                :rules="[requiredValidator]"
+              />
+            </VCol>
+            <!-- {{ lstCountry }} -->
+            <VCol cols="12">
+              <VSelect
+                v-model="country"
+                :items="lstCountry.map((i) => i.name)"
+                label="Quốc gia"
               />
             </VCol>
             <VCol cols="12">
@@ -1247,6 +1300,13 @@ onMounted(() => {
                 v-model="Edit.email1"
                 :rules="[emailValidator, requiredValidator]"
                 label="Email"
+              />
+            </VCol>
+            <VCol cols="12">
+              <VSelect
+                :items="lstCountry.map((i) => i.name)"
+                label="Quốc gia"
+                v-model="Edit.country"
               />
             </VCol>
             <VCol cols="12">
