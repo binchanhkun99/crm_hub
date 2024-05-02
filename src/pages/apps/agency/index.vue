@@ -656,6 +656,8 @@ onMounted(() => {
                   <th scope="col">STT</th>
                   <th scope="col">User</th>
                   <th scope="col">Email</th>
+                  <th scope="col">Ngày tạo</th>
+                  <th scope="col">Ngày hết hạn</th>
                   <th scope="col">Mã giới thiệu</th>
                 </tr>
               </thead>
@@ -683,6 +685,25 @@ onMounted(() => {
                       <div class="d-flex flex-column">
                         <h6 class="text-sm">
                           {{ user.mail }}
+                        </h6>
+                      </div>
+                    </div>
+                  </td>
+      
+                  <td>
+                    <div class="d-flex align-center">
+                      <div class="d-flex flex-column">
+                        <h6 class="text-sm">
+                          {{ user.thoiGianDangKy }}
+                        </h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-center">
+                      <div class="d-flex flex-column">
+                        <h6 class="text-sm">
+                          {{ user.thoiGianHetHan }}
                         </h6>
                       </div>
                     </div>

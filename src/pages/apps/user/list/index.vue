@@ -359,8 +359,14 @@ const showEdit = async (id) => {
       Edit.value.maGioiThieuAdd1 = data.user.maGioiThieu;
       Edit.value.ngayDangKy1 = data.user.thoiGianDangKy;
       Edit.value.ngayHetHan1 = data.user.thoiGianHetHan;
-      let sdt = data.user.phone.toString(); // Chuyển đổi số thành chuỗi
+      if(data.user.phone){
+        let sdt = data.user.phone.toString(); // Chuyển đổi số thành chuỗi
       Edit.value.phone = sdt.charAt(0) !== "0" ? "0" + sdt : sdt;
+      }
+      else{
+        Edit.value.phone=""
+      }
+
 
       Edit.value.country = data.user.country;
       selectedQuyen.value = data.user.level;
