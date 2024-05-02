@@ -694,7 +694,7 @@ onMounted(() => {
                     <div class="d-flex align-center">
                       <div class="d-flex flex-column">
                         <h6 class="text-sm">
-                          {{ user.thoiGianDangKy }}
+                          {{ user.services[0].createAt }}
                         </h6>
                       </div>
                     </div>
@@ -703,7 +703,7 @@ onMounted(() => {
                     <div class="d-flex align-center">
                       <div class="d-flex flex-column">
                         <h6 class="text-sm">
-                          {{ user.thoiGianHetHan }}
+                          {{ user.services[0].expiry_date }}
                         </h6>
                       </div>
                     </div>
