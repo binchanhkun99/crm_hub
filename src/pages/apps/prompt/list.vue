@@ -764,7 +764,7 @@ onMounted(async () => {
                 </td>
                 <td>
                   <span class="text-base text-high-emphasis">{{
-                    user.typeAI
+                    user.typeAI == 0 ? "Hình ảnh" : "GPT"
                   }}</span>
                 </td>
                 <td>
