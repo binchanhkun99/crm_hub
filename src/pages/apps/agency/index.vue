@@ -495,34 +495,7 @@ onMounted(() => {
           <VDivider />
 
           <!-- SECTION Pagination -->
-          <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
-            <!-- 👉 Rows per page -->
-            <div class="d-flex align-center" style="width: 200px">
-              <span class="text-no-wrap text-sm me-3">Dòng trên mỗi trang:</span>
-              <VSelect
-                v-model="rowPerPage"
-                density="compact"
-                class="per-page-select"
-                variant="plain"
-                :items="[10, 20, 30, 50]"
-              />
-            </div>
-
-            <!-- 👉 Pagination and pagination meta -->
-            <div class="d-flex align-center">
-              <h6 class="text-sm font-weight-regular">
-                {{ paginationData }}
-              </h6>
-            </div>
-            <VPagination
-              v-model="currentPage"
-              size="small"
-              :total-visible="7"
-              :length="pageSize"
-              @next="selectedRows = []"
-              @prev="selectedRows = []"
-            />
-          </VCardText>
+         
           <!-- !SECTION -->
         </VCard>
       </VCol>
@@ -733,7 +706,34 @@ onMounted(() => {
             <VDivider />
 
             <!-- SECTION Pagination -->
-       
+            <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
+              <!-- 👉 Rows per page -->
+              <div class="d-flex align-center" style="width: 200px">
+                <span class="text-no-wrap text-sm me-3">Dòng trên mỗi trang:</span>
+                <VSelect
+                  v-model="rowPerPageMgt"
+                  density="compact"
+                  class="per-page-select"
+                  variant="plain"
+                  :items="[10, 20, 30, 50]"
+                />
+              </div>
+
+              <!-- 👉 Pagination and pagination meta -->
+              <div class="d-flex align-center">
+                <h6 class="text-sm font-weight-regular">
+                  {{ paginationDataMgt }}
+                </h6>
+              </div>
+              <VPagination
+                v-model="currentPageMgt"
+                size="small"
+                :total-visible="7"
+                :length="pageSizeMgt"
+                @next="selectedRowsMgt = []"
+                @prev="selectedRowsMgt = []"
+              />
+            </VCardText>
             <!-- !SECTION -->
           </VCard>
         </VCol>
