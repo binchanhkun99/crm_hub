@@ -59,6 +59,7 @@ const pageSize = ref(0);
 page.value = currentPage.value;
 // 👉 Fetching dataPrompt
 const fetchPackage = async () => {
+dataPrompt.value = []
   let offset = (page.value - 1);
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
@@ -131,6 +132,7 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
+  console.log("Test thử", dataPrompt.value);
   const firstIndex =  dataPrompt.value.length
     ? (currentPage.value - 1) * rowPerPage.value + 1
     : 0;
