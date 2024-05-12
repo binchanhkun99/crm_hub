@@ -245,8 +245,8 @@ const addUser = async () => {
   let objmgt = {};
   if (quyenUser.value == 2 || quyenUser.value == 3) {
     if (!maGioiThieuDaiLy.value) {
-      alert("Mã giới thiệu không được để trống!");
-      return;
+     maGioiThieuDaiLy.value= ''
+
     } else {
       objmgt = {
         maGioiThieu: maGioiThieuDaiLy.value,
@@ -254,8 +254,7 @@ const addUser = async () => {
     }
   } else {
     if (!maGioiThieuAdd.value) {
-      alert("Mã giới thiệu không được để trống!");
-      return;
+      maGioiThieuAdd.value=''
     } else {
       objmgt = {
         maGioiThieu: maGioiThieuAdd.value,
@@ -268,6 +267,7 @@ const addUser = async () => {
   dataForm.append("mail", email.value);
   dataForm.append("maGioiThieu", objmgt.maGioiThieu);
   dataForm.append("role", quyenUser.value);
+  dataForm.append("phone", phone.value);
   try {
     loadingAddUser.value = true;
     const response = await request.post("api/reg_acc.php", dataForm);
@@ -359,13 +359,14 @@ const showEdit = async (id) => {
       Edit.value.maGioiThieuAdd1 = data.user.maGioiThieu;
       Edit.value.ngayDangKy1 = data.user.thoiGianDangKy;
       Edit.value.ngayHetHan1 = data.user.thoiGianHetHan;
-      if(data.user.phone){
-        let sdt = data.user.phone.toString(); // Chuyển đổi số thành chuỗi
-      Edit.value.phone = sdt.charAt(0) !== "0" ? "0" + sdt : sdt;
-      }
-      else{
-        Edit.value.phone=""
-      }
+      Edit.value.phone = data.user.phone
+      // if(data.user.phone){
+      //   let sdt = data.user.phone.toString(); // Chuyển đổi số thành chuỗi
+      // Edit.value.phone = sdt.charAt(0) !== "0" ? "0" + sdt : sdt;
+      // }
+      // else{
+      //   Edit.value.phone=""
+      // }
 
 
       Edit.value.country = data.user.country;
@@ -881,11 +882,7 @@ onMounted(() => {
                 <!-- 👉 Phone -->
                 <td>
                   <span class="text-capitalize text-base">{{
-                    user.phone ? user.phone.toString() !== ""
-                      ? user.phone.toString().charAt(0) !== "0"
-                        ? "0" + user.phone.toString()
-                        : user.phone.toString()
-                      : "" : user.phone
+                    user.phone
                   }}</span>
                 </td>
 
