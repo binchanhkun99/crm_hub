@@ -62,25 +62,38 @@ const fetchBanner = async () => {
   loading.value = true;
   var data = JSON.parse(localStorage.getItem("user")) || {};
   apiKey.value = data.key;
-  await request
-    .get(`api/getType.php?type=ChuDe`)
-    .then((rss) => {
-      if (rss.data.status) {
-        const chuDeList = rss.data.data.filter((item) => item.ChuDe !== ""); // Lọc ra các phần tử có giá trị cho ChuDe
-        ListChuDe.value = chuDeList;
 
-        totalPage.value = rss.data.count;
-        pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
-      }
-      loading.value = false;
-    })
-    .catch((error) => {
-      loading.value = false;
-      // console.log(error);
-    });
+  try {
+    // Gọi cả hai API và chờ cả hai kết quả trả về
+    const [res1, res2] = await Promise.all([
+      request.get(`api/getType.php?type=ChuDe`),
+      request.get(`dalle/getPromptType.php?type=chuDe`)
+    ]);
+
+    if (res1.data.status && res2.data.status) {
+      // Lọc ra các phần tử có giá trị cho ChuDe từ cả hai API
+      const chuDeList1 = res1.data.data.filter((item) => item.ChuDe !== "");
+      const chuDeList2 = res2.data.data.filter((item) => item.chuDe !== "");
+
+      // Ghép mảng từ cả hai API
+      const mergedChuDeList = [...chuDeList1, ...chuDeList2];
+     
+      ListChuDe.value = mergedChuDeList; // Gán danh sách chủ đề cho ListChuDe
+      console.log("ListChuDe.value+++++", ListChuDe.value);
+      totalPage.value = res1.data.count; // Lấy tổng số trang từ res1
+      pageSize.value = Math.ceil(totalPage.value / rowPerPage.value) || 0;
+    }
+
+    loading.value = false;
+  } catch (error) {
+    loading.value = false;
+    console.log(error);
+  }
+
   selectedRole.value = "all";
   selectedPlan.value = "all";
 };
+
 
 // 👉 Fetching chuDeList
 const fetchBannerPag = async (page) => {
@@ -221,20 +234,69 @@ const addSubChuDe = async () => {
   loadingEdit.value = true;
   //get chủ đề
   try {
-    const res = await request.get(`api/getType.php?type=ChuDe`);
-    if (res.data.status) {
-      chuDeList.value = res.data.data.filter((item) => item.ChuDe !== "");
-      lsChuDe.value = chuDeList.value.map((item) => item.ChuDe);
+    // Gọi cả hai API và chờ cả hai kết quả trả về
+    const [res1, res2] = await Promise.all([
+      request.get(`api/getType.php?type=ChuDe`),
+      request.get(`dalle/getPromptType.php?type=chuDe`)
+    ]);
+
+    if (res1.data.status && res2.data.status) {
+      // Lọc ra các phần tử có giá trị cho ChuDe từ API đầu tiên
+      const chuDeList1 = res1.data.data.filter((item) => item.ChuDe !== "");
+
+      // Lọc ra các phần tử có giá trị cho chuDe từ API thứ hai
+      const chuDeList2 = res2.data.data.filter((item) => item.chuDe !== "");
+
+      // Ghép mảng từ cả hai API
+      const mergedChuDeList = [...chuDeList1, ...chuDeList2];
+
+      chuDeList.value = mergedChuDeList; // Gán danh sách chủ đề cho chuDeList
+      const addSubChuDe = async () => {
+  loadingEdit.value = true;
+  //get chủ đề
+  try {
+    // Gọi cả hai API và chờ cả hai kết quả trả về
+    const [res1, res2] = await Promise.all([
+      request.get(`api/getType.php?type=ChuDe`),
+      request.get(`dalle/getPromptType.php?type=chuDe`)
+    ]);
+
+    if (res1.data.status && res2.data.status) {
+      // Lọc ra các phần tử có giá trị cho ChuDe từ API đầu tiên
+      const chuDeList1 = res1.data.data.filter((item) => item.ChuDe !== "");
+
+      // Lọc ra các phần tử có giá trị cho chuDe từ API thứ hai
+      const chuDeList2 = res2.data.data.filter((item) => item.chuDe !== "");
+
+      // Ghép mảng từ cả hai API
+      const mergedChuDeList = [...chuDeList1, ...chuDeList2];
+
+      chuDeList.value = mergedChuDeList; // Gán danh sách chủ đề cho chuDeList
+
+      // Sử dụng biểu thức điều kiện để chọn trường đúng trong hàm map
+      lsChuDe.value = mergedChuDeList.map((item) => (item.ChuDe !== undefined ? item.ChuDe : item.chuDe));
+
       isNewSub.value = true;
-      loadingEdit.value = false;
-    } else {
-      loadingEdit.value = false;
     }
+
+    loadingEdit.value = false;
   } catch (error) {
     console.log(error);
     loadingEdit.value = false;
   }
 };
+
+      isNewSub.value = true;
+    }
+
+    loadingEdit.value = false;
+  } catch (error) {
+    console.log(error);
+    loadingEdit.value = false;
+  }
+};
+
+
 const subChuDe = ref();
 const listSubCD = ref([]);
 watch(selectChuDe, async (newVal, oldVal) => {
@@ -447,7 +509,7 @@ onMounted(() => {
                   <div class="d-flex align-center">
                     <div class="d-flex flex-column">
                       <h6 class="text-sm">
-                        {{ user.ChuDe }}
+                        {{ user.ChuDe || user.chuDe}}
                       </h6>
                     </div>
                   </div>
@@ -474,34 +536,7 @@ onMounted(() => {
           <VDivider />
 
           <!-- SECTION Pagination -->
-          <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
-            <!-- 👉 Rows per page -->
-            <div class="d-flex align-center" style="width: 200px">
-              <span class="text-no-wrap text-sm me-3">Dòng trên mỗi trang:</span>
-              <VSelect
-                v-model="rowPerPage"
-                density="compact"
-                class="per-page-select"
-                variant="plain"
-                :items="[10, 20, 30, 50]"
-              />
-            </div>
-
-            <!-- 👉 Pagination and pagination meta -->
-            <div class="d-flex align-center">
-              <h6 class="text-sm font-weight-regular">
-                {{ paginationData }}
-              </h6>
-            </div>
-            <VPagination
-              v-model="currentPage"
-              size="small"
-              :total-visible="7"
-              :length="pageSize"
-              @next="selectedRows = []"
-              @prev="selectedRows = []"
-            />
-          </VCardText>
+   
           <!-- !SECTION -->
         </VCard>
       </VCol>

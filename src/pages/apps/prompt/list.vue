@@ -228,10 +228,29 @@ const beforAdd = async () => {
   loadingEdit.value = true;
   //get chủ đề
   try {
-    const res = await request.get(`api/getType.php?type=ChuDe`);
-    if (res.data.status) {
-      chuDeList.value = res.data.data.filter((item) => item.ChuDe !== "");
-      ListChuDe.value = chuDeList.value.map((item) => item.ChuDe);
+    // Gọi cả hai API và chờ cả hai kết quả trả về
+    const [res, res2] = await Promise.all([
+      request.get(`api/getType.php?type=ChuDe`),
+      request.get(`dalle/getPromptType.php?type=chuDe`)
+    ]);
+
+    if (res.data.status && res2.data.status) {
+      // Ghép mảng từ res2 vào res
+      const mergedData = [...res.data.data, ...res2.data.data];
+      
+      // Lọc các phần tử không rỗng và không undefined
+      const filteredData = mergedData.filter((item) => {
+        return (item.ChuDe !== undefined && item.ChuDe !== "") || 
+               (item.chuDe !== undefined && item.chuDe !== "");
+      });
+
+      chuDeList.value = filteredData.map((item) => {
+        // Lấy giá trị từ trường ChuDe hoặc chuDe tùy thuộc vào trường nào tồn tại
+        return item.ChuDe !== undefined ? item.ChuDe : item.chuDe;
+      });
+
+      ListChuDe.value = chuDeList.value; // Gán danh sách chủ đề cho ListChuDe
+      
       isDialogVisible.value = true;
       loadingEdit.value = false;
     } else {
@@ -242,6 +261,7 @@ const beforAdd = async () => {
     loadingEdit.value = false;
   }
 };
+
 
 // 👉 Watch chủ đề chính get chủ đề con
 watch(_ChuDe, async (newVal, oldVal) => {
@@ -367,12 +387,26 @@ const onFinish = async (values) => {
 };
 const beforEdit = async () => {
   loadingEdit.value = true;
-  //get chủ đề
+  // Get chủ đề
   try {
     const res = await request.get(`api/getType.php?type=ChuDe`);
-    if (res.data.status) {
-      chuDeList.value = res.data.data.filter((item) => item.ChuDe !== "");
-      ListChuDe.value = chuDeList.value.map((item) => item.ChuDe);
+    const res2 = await request.get(`dalle/getPromptType.php?type=chuDe`)
+    if (res.data.status && res2.data.status) {
+      // Ghép mảng từ res2 vào res
+      const mergedData = [...res.data.data, ...res2.data.data];
+      
+      // Lọc các phần tử không rỗng và không undefined
+      const filteredData = mergedData.filter((item) => {
+        return (item.ChuDe !== undefined && item.ChuDe !== "") || 
+               (item.chuDe !== undefined && item.chuDe !== "");
+      });
+
+      chuDeList.value = filteredData.map((item) => {
+        // Lấy giá trị từ trường ChuDe hoặc chuDe tùy thuộc vào trường nào tồn tại
+        return item.ChuDe !== undefined ? item.ChuDe : item.chuDe;
+      });
+      console.log("chuDeList.value_____", chuDeList.value);
+
       loadingEdit.value = false;
     } else {
       loadingEdit.value = false;
@@ -382,6 +416,8 @@ const beforEdit = async () => {
     loadingEdit.value = false;
   }
 };
+
+
 const platformLists = ["web", "extension", "window", "android", "iphone"];
 const clearFields = () => {
   _ChuDe.value = ""; // Clear title field
@@ -853,7 +889,7 @@ onMounted(async () => {
               />
             </VCol>
             <VCol cols="12">
-              <VSelect :items="ListChuDe" v-model="_ChuDe" label="Chủ đề" />
+              <VSelect :items="chuDeList" v-model="_ChuDe" label="Chủ đề" />
               <!-- Chủ đề -->
             </VCol>
             <VCol cols="12">
@@ -1041,7 +1077,7 @@ onMounted(async () => {
               />
             </VCol>
             <VCol cols="12">
-              <VSelect :items="ListChuDe" v-model="Edit.ChuDe" label="Chủ đề" />
+              <VSelect :items="chuDeList" v-model="Edit.ChuDe" label="Chủ đề" />
               <!-- Chủ đề -->
             </VCol>
             <VCol cols="12">

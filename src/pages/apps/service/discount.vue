@@ -563,8 +563,8 @@ onMounted(() => {
           <VDivider />
 
           <!-- SECTION Pagination -->
-          <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
-            <!-- 👉 Rows per page -->
+          <!-- <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
+
             <div class="d-flex align-center" style="width: 200px">
               <span class="text-no-wrap text-sm me-3">Dòng trên mỗi trang:</span>
               <VSelect
@@ -576,7 +576,7 @@ onMounted(() => {
               />
             </div>
 
-            <!-- 👉 Pagination and pagination meta -->
+         
             <div class="d-flex align-center">
               <h6 class="text-sm font-weight-regular">
                 {{ paginationData }}
@@ -590,7 +590,7 @@ onMounted(() => {
               @next="selectedRows = []"
               @prev="selectedRows = []"
             />
-          </VCardText>
+          </VCardText> -->
           <!-- !SECTION -->
         </VCard>
       </VCol>
