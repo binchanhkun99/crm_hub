@@ -251,41 +251,10 @@ const addSubChuDe = async () => {
       const mergedChuDeList = [...chuDeList1, ...chuDeList2];
 
       chuDeList.value = mergedChuDeList; // Gán danh sách chủ đề cho chuDeList
-      const addSubChuDe = async () => {
-  loadingEdit.value = true;
-  //get chủ đề
-  try {
-    // Gọi cả hai API và chờ cả hai kết quả trả về
-    const [res1, res2] = await Promise.all([
-      request.get(`api/getType.php?type=ChuDe`),
-      request.get(`dalle/getPromptType.php?type=chuDe`)
-    ]);
-
-    if (res1.data.status && res2.data.status) {
-      // Lọc ra các phần tử có giá trị cho ChuDe từ API đầu tiên
-      const chuDeList1 = res1.data.data.filter((item) => item.ChuDe !== "");
-
-      // Lọc ra các phần tử có giá trị cho chuDe từ API thứ hai
-      const chuDeList2 = res2.data.data.filter((item) => item.chuDe !== "");
-
-      // Ghép mảng từ cả hai API
-      const mergedChuDeList = [...chuDeList1, ...chuDeList2];
-
-      chuDeList.value = mergedChuDeList; // Gán danh sách chủ đề cho chuDeList
 
       // Sử dụng biểu thức điều kiện để chọn trường đúng trong hàm map
       lsChuDe.value = mergedChuDeList.map((item) => (item.ChuDe !== undefined ? item.ChuDe : item.chuDe));
-
-      isNewSub.value = true;
-    }
-
-    loadingEdit.value = false;
-  } catch (error) {
-    console.log(error);
-    loadingEdit.value = false;
-  }
-};
-
+      
       isNewSub.value = true;
     }
 
