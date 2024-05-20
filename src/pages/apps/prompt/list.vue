@@ -225,6 +225,7 @@ const optionsTypeAI = ref([
 //   },
 // ]);
 const beforAdd = async () => {
+
   loadingEdit.value = true;
   //get chủ đề
   try {
@@ -250,7 +251,7 @@ const beforAdd = async () => {
       });
 
       ListChuDe.value = chuDeList.value; // Gán danh sách chủ đề cho ListChuDe
-      
+      dynamicAll.value = []
       isDialogVisible.value = true;
       loadingEdit.value = false;
     } else {
@@ -305,16 +306,19 @@ const removeSelect = (item) => {
   }
 };
 const addInput = (type) => {
+
   if (type == "text") {
     dynamicAll.value.push({
       inputName: "",
       placeholder: "",
+      type:"text"
     });
   }
   if (type == "select") {
     dynamicAll.value.push({
       inputName: "",
       options: "",
+      type:"select"
     });
   }
 };
@@ -510,12 +514,14 @@ const addInputEdit = () => {
     Edit.value.input.push({
       inputName: "",
       placeholder: "",
+      type: "text"
     });
   }
   if (Edit.value.inputType == "select") {
     Edit.value.input.push({
       inputName: "",
       options: "",
+      type: "select"
     });
   }
 };
@@ -707,7 +713,7 @@ onMounted(async () => {
 
             <div class="d-flex align-center">
               <!-- 👉 Add Prompt button -->
-              <VBtn @click="beforAdd"> Thêm Prompt </VBtn>
+              <VBtn @click="beforAdd"> Thêm Prompt  </VBtn>
             </div>
           </VCardText>
           <VDivider />
@@ -955,15 +961,15 @@ onMounted(async () => {
                   <a-input v-model:value="user.inputName" placeholder="Input" />
 
                   <a-input
-                    v-if="inputTypeVal == 'text'"
+                    v-if="user.type == 'text'"
                     v-model:value="user.placeholder"
                     placeholder="Value"
                   />
                   <a-select
-                    v-if="inputTypeVal == 'select'"
+                    v-if="user.type == 'select'"
                     v-model:value="user.options"
                     mode="tags"
-                    style="width: 120px"
+                 
                     placeholder="Tags Mode"
                     @change="handleChange"
                   ></a-select>
