@@ -241,6 +241,12 @@ const items = ref([
   { label: "Cộng tác viên", value: 3 },
   { label: "Người dùng", value: 4 },
 ]);
+function isValidGmail(email) {
+    // Regex kiểm tra định dạng email và chỉ chấp nhận gmail.com
+    const regex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return regex.test(email);
+}
+
 const addUser = async () => {
   let objmgt = {};
   if (quyenUser.value == 2 || quyenUser.value == 3) {
@@ -261,6 +267,7 @@ const addUser = async () => {
       };
     }
   }
+
   let dataForm = new FormData();
   dataForm.append("user", userName.value);
   dataForm.append("pass", password.value);
@@ -268,6 +275,11 @@ const addUser = async () => {
   dataForm.append("maGioiThieu", objmgt.maGioiThieu);
   dataForm.append("role", quyenUser.value);
   dataForm.append("phone", phone.value);
+  dataForm.append("country", country.value);
+  if(!isValidGmail(email.value)){
+   return alert("Chỉ chấp nhận Gmail");
+  }
+
   try {
     loadingAddUser.value = true;
     const response = await request.post("api/reg_acc.php", dataForm);
@@ -402,6 +414,9 @@ const pushNotiError = () => {
 };
 const SaveEdit = async () => {
   try {
+    if(!isValidGmail(email.value)){
+   return alert("Chỉ chấp nhận Gmail");
+  }
     loadingAddUser.value = true;
     const res = await request.post(
       `api/admin/index.php?key=${apiKey.value}&action=user_edit`,
@@ -680,18 +695,29 @@ const addTime = async () => {
 // 👉 OnMounted
 const role = ref(0);
 const loadCountry = async () => {
-  if (lstCountry.value.length == 0) {
-    const pere = await fetch("https://restcountries.com/v3.1/all");
-    let res = await pere.json();
-    for (const iterator of res) {
-      lstCountry.value.push({
-        name: iterator.name.common,
-        cca2: iterator.cca2,
-        cca3: iterator.cca3,
-      });
+  if (lstCountry.value.length === 0) {
+    // Fetch dữ liệu từ API mới
+    const response = await fetch("https://countriesnow.space/api/v0.1/countries"); 
+    let result = await response.json();
+
+    // Kiểm tra nếu không có lỗi trong dữ liệu trả về
+    if (!result.error && result.data) {
+      for (const countryData of result.data) {
+        lstCountry.value.push({
+          name: countryData.country,
+          iso2: countryData.iso2,
+          iso3: countryData.iso3,
+          cities: countryData.cities
+        });
+      }
+    } else {
+      console.error("Có lỗi khi tải dữ liệu quốc gia và thành phố:", result.msg);
     }
   }
 };
+
+
+
 onMounted(() => {
   const dataRole = JSON.parse(localStorage.getItem("user")) || {};
   role.value = dataRole.level;
