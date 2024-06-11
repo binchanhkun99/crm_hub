@@ -112,12 +112,42 @@ const fetchPackagePag = async (page) => {
   selectedRole.value = "all";
   selectedPlan.value = "all";
 };
+const fetchPackageSearch = async (page) => {
+  dataPrompt.value = [];
+  // let offset = (page - 1);xx`
+  loading.value = true;
+  var data = JSON.parse(localStorage.getItem("user")) || {};
+  apiKey.value = data.key;
+  await request
+    .get(
+      `api/getPromtList.php?key=${apiKey.value}&page=0&limit=${rowPerPage.value}&search=${searchQuery.value}`
+    )
+    .then((rss) => {
+      if ((rss.data.status = "success")) {
+        dataPrompt.value = rss.data.data;
 
+        totalPage.value = rss.data.count;
+        pageSize.value = Math.ceil(totalPage.value / rowPerPage.value);
+        loading.value = false;
+      }
+      loading.value = false;
+    })
+    .catch((error) => {
+      loading.value = false;
+      // console.log(error);
+    });
+  selectedRole.value = "all";
+  selectedPlan.value = "all";
+};
 // 👉 watching current page
-watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
+// watch((currentPage, ) => {
+//   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
+// });
+watch(currentPage, (newVal, oldVal) => {
+  if (newVal > totalPage.value) currentPage.value = totalPage.value;
 });
 watch(currentPage, (newVal, oldVal) => {
+  console.log("Vào đây?")
   fetchPackagePag(newVal);
 });
 
@@ -125,14 +155,10 @@ watch(currentPage, (newVal, oldVal) => {
 
 const isAddNewUserDrawerVisible = ref(false);
 
-// 👉 watching current page
-watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  console.log("Test thử", dataPrompt.value);
+
   const firstIndex =  dataPrompt.value.length
     ? (currentPage.value - 1) * rowPerPage.value + 1
     : 0;
@@ -190,8 +216,9 @@ const deleteUser = async () => {
 
 // 👉 Search User
 const SearchUser = async () => {
-  currentPage.value = 0;
-  fetchPackage();
+  show1.value = true; // Đặt show1 thành true khi bắt đầu tìm kiếm
+  await fetchPackageSearch();
+  show1.value = false; // Đặt show1 thành false khi kết thúc tìm kiếm
 };
 
 // 👉 Add Prompt

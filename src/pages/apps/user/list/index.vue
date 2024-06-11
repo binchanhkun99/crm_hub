@@ -414,7 +414,7 @@ const pushNotiError = () => {
 };
 const SaveEdit = async () => {
   try {
-    if(!isValidGmail(email.value)){
+    if(!isValidGmail(Edit.value.email1)){
    return alert("Chỉ chấp nhận Gmail");
   }
     loadingAddUser.value = true;
