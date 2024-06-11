@@ -538,13 +538,20 @@ const removeSelectEdit = (item) => {
 };
 const addInputEdit = () => {
   if (Edit.value.inputType == "text") {
+    if(!Edit.value.input){
+      Edit.value.input = []
+    }
     Edit.value.input.push({
       inputName: "",
       placeholder: "",
       type: "text"
     });
   }
+  
   if (Edit.value.inputType == "select") {
+    if(!Edit.value.input){
+      Edit.value.input = []
+    }
     Edit.value.input.push({
       inputName: "",
       options: "",
@@ -1201,7 +1208,7 @@ onMounted(async () => {
                     <a-select
                       v-model:value="user.options"
                       mode="tags"
-                      style="width: 120px"
+                   
                       placeholder="Tags Mode"
                     ></a-select>
                   </div>
